@@ -8,6 +8,8 @@ public abstract class ContentTable {
     public static final String TABLE_NAME = "content";
 
     public static final String ID_COLUMN = "id";
+    public static final String FAKKU_ID_COLUMN = "fakku_id";
+    public static final String CATEGORY_COLUMN = "category";
     public static final String URL_COLUMN = "url";
     public static final String TITLE_COLUMN = "title";
     public static final String HTML_DESCRIPTION_COLUMN = "html_description";
@@ -17,8 +19,11 @@ public abstract class ContentTable {
     public static final String STATUS_COLUMN = "status";
 
     public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-            + ID_COLUMN + " INTEGER PRIMARY KEY," + URL_COLUMN + " TEXT," + HTML_DESCRIPTION_COLUMN + " TEXT,"
+            + ID_COLUMN + " INTEGER PRIMARY KEY," + FAKKU_ID_COLUMN + " TEXT," + CATEGORY_COLUMN + " TEXT,"
+            + URL_COLUMN + " TEXT," + HTML_DESCRIPTION_COLUMN + " TEXT,"
             + TITLE_COLUMN + " TEXT" + "," + QTY_PAGES_COLUMN + " INTEGER" + ","
             + UPLOAD_DATE_COLUMN + " INTEGER" + "," + DOWNLOAD_DATE_COLUMN + " INTEGER" + ","
             + STATUS_COLUMN + " INTEGER" + ")";
+
+    public static final String INSERT_STATEMENT = "INSERT OR REPLACE INTO "+ TABLE_NAME +" VALUES (?,?,?,?,?,?,?,?,?,?);";
 }

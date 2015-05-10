@@ -33,7 +33,7 @@ public class Content extends ContentTable{
     private Status status;
 
     public Integer getId() {
-        return url.substring(url.lastIndexOf("/")+1).hashCode();
+        return url.hashCode();
     }
 
     public String getFakkuId() {

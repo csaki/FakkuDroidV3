@@ -3,6 +3,7 @@ package com.devsaki.fakkudroid.parser;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
+import com.devsaki.fakkudroid.database.enums.Status;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -88,6 +89,7 @@ public class FakkuParser {
             result.setHtmlDescription(rows.get(rowIndex++).select(".right").html());
             //Tags
             result.setTags(parseAttributes(rows.get(rowIndex++).select("a"), AttributeType.TAG));
+            result.setStatus(Status.SAVED);
         }
         return result;
     }
@@ -120,6 +122,7 @@ public class FakkuParser {
         result.setHtmlDescription(rows.get(rowIndex++).select(".right").html());
         //Tags
         result.setTags(parseAttributes(rows.get(rowIndex++).select("a"), AttributeType.TAG));
+        result.setStatus(Status.SAVED);
         return result;
     }
 
