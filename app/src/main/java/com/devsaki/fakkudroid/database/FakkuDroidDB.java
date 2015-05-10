@@ -2,6 +2,7 @@ package com.devsaki.fakkudroid.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
@@ -13,6 +14,8 @@ import com.devsaki.fakkudroid.database.contants.ImageFileTable;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.database.enums.AttributeType;
+import com.devsaki.fakkudroid.database.enums.Status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,5 +141,84 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             statement.bindLong(indexColumn++, row.getStatus().getCode());
             statement.execute();
         }
+    }
+
+    public Content selectContentById(int id){
+        Content result = null;
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+
+            db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id+""});
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                int indexColumn = 3;
+                result = new Content();
+                result.setUrl(cursor.getString(indexColumn++));
+                result.setTitle(cursor.getString(indexColumn++));
+                result.setHtmlDescription(cursor.getString(indexColumn++));
+                result.setQtyPages(cursor.getInt(indexColumn++));
+                result.setUploadDate(cursor.getLong(indexColumn++));
+                result.setDownloadDate(cursor.getLong(indexColumn++));
+                result.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+            }
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+
+        return result;
+    }
+
+    public List<ImageFile> selectImageFilesByContentId(int id){
+        List<ImageFile> result = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+
+            db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id+""});
+
+            // looping through all rows and adding to list
+            while (cursor.moveToFirst()) {
+                int indexColumn = 2;
+                ImageFile item = new ImageFile();
+                item.setOrder(cursor.getInt(indexColumn++));
+                item.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                item.setUrl(cursor.getString(indexColumn++));
+                item.setName(cursor.getString(indexColumn++));
+                result.add(item);
+            }
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+
+        return result;
+    }
+
+    public List<Attribute> selectAttributeByContentId(int id, AttributeType type){
+        List<Attribute> result = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+
+            db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id+"", type.getCode() + ""});
+
+            // looping through all rows and adding to list
+            while (cursor.moveToFirst()) {
+                int indexColumn = 1;
+                Attribute item = new Attribute();
+                item.setUrl(cursor.getString(indexColumn++));
+                item.setName(cursor.getString(indexColumn++));
+                item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
+                result.add(item);
+            }
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+
+        return result;
     }
 }

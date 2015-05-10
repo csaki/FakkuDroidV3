@@ -22,4 +22,14 @@ public enum AttributeType {
     public String getDescription() {
         return description;
     }
+
+    public static AttributeType searchByCode(int code){
+
+        for(AttributeType s : AttributeType.values()){
+            if(s.getCode()==code)
+                return s;
+        }
+
+        return null;
+    }
 }

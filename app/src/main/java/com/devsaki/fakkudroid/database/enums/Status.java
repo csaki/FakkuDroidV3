@@ -22,4 +22,14 @@ public enum Status {
     public String getDescription() {
         return description;
     }
+
+    public static Status searchByCode(int code){
+
+        for(Status s : Status.values()){
+            if(s.getCode()==code)
+                return s;
+        }
+
+        return null;
+    }
 }

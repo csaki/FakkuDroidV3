@@ -25,5 +25,9 @@ public abstract class ContentTable {
             + UPLOAD_DATE_COLUMN + " INTEGER" + "," + DOWNLOAD_DATE_COLUMN + " INTEGER" + ","
             + STATUS_COLUMN + " INTEGER" + ")";
 
-    public static final String INSERT_STATEMENT = "INSERT OR REPLACE INTO "+ TABLE_NAME +" VALUES (?,?,?,?,?,?,?,?,?,?);";
+    public static final String INSERT_STATEMENT = "INSERT OR REPLACE INTO " + TABLE_NAME + " VALUES (?,?,?,?,?,?,?,?,?,?);";
+
+    public static final String SELECT_BY_CONTENT_ID = "SELECT " + ID_COLUMN + ", " + FAKKU_ID_COLUMN + ", " + CATEGORY_COLUMN + ", " + URL_COLUMN + ", "
+            + TITLE_COLUMN + ", " + HTML_DESCRIPTION_COLUMN + ", " + QTY_PAGES_COLUMN + ", "
+            + UPLOAD_DATE_COLUMN + ", " + DOWNLOAD_DATE_COLUMN + ", " + STATUS_COLUMN + " FROM " + TABLE_NAME + " C WHERE C." + ID_COLUMN + " = ?";
 }

@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.melnykov.fab.FloatingActionButton;
@@ -30,6 +31,8 @@ public class MainActivity extends ActionBarActivity {
     private static final String TAG = "MainActivity";
     private final String FAKKU_URL = "https://www.fakku.net";
 
+    private FakkuDroidDB db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,8 @@ public class MainActivity extends ActionBarActivity {
         webview.loadUrl(FAKKU_URL);
         FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
         fabDownload.hide(true);
+
+        db = new FakkuDroidDB(MainActivity.this);
     }
 
 
@@ -69,14 +74,13 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(event.getAction() == KeyEvent.ACTION_DOWN){
-            switch(keyCode)
-            {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
                 case KeyEvent.KEYCODE_BACK:
                     WebView webview = (WebView) findViewById(R.id.wbMain);
-                    if(webview.canGoBack()){
+                    if (webview.canGoBack()) {
                         webview.goBack();
-                    }else{
+                    } else {
                         finish();
                     }
                     return true;
@@ -88,67 +92,68 @@ public class MainActivity extends ActionBarActivity {
 
     class CustomWebViewClient extends WebViewClient {
 
-        public boolean shouldOverrideUrlLoading(WebView view, String url)
-        {
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
             try {
                 URL u = new URL(url);
-                if(u.getHost().equals("www.fakku.net")){
+                if (u.getHost().equals("www.fakku.net")) {
                     view.loadUrl(url);
                     return false;
-                }else{
+                } else {
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(url));
                     startActivity(i);
                     return true;
                 }
-            } catch (MalformedURLException e) {}
+            } catch (MalformedURLException e) {
+            }
             return super.shouldOverrideUrlLoading(view, url);
         }
 
         @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon)
-        {
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
             FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
             fabDownload.hide();
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            if(url.startsWith("https://www.fakku.net/manga/")||url.startsWith("https://www.fakku.net/doujinshi/")) {
+            if (url.startsWith("https://www.fakku.net/manga/") || url.startsWith("https://www.fakku.net/doujinshi/")) {
                 view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
             }
         }
     }
 
-    class  FakkuLoadListener{
+    class FakkuLoadListener {
 
         @JavascriptInterface
-        public void processHTML(String html)
-        {
+        public void processHTML(String html) {
             Content content = FakkuParser.parseContent(html);
-            if(content==null){
+            if (content == null) {
                 return;
             }
-            Log.i(TAG, "Saving content : " + content.getUrl());
-            try {
-                content.setImageFiles(new ArrayList<ImageFile>(content.getQtyPages()));
-                String urlCdn = "http://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/"))+ "/images/";
-                for(int i = 1; i <=content.getQtyPages();i++){
-                    String name = String.format("%03d", i) + ".jpg";
-                    ImageFile imageFile = new ImageFile();
-                    imageFile.setUrl(urlCdn + name);
-                    imageFile.setOrder(i);
-                    imageFile.setStatus(Status.SAVED);
-                    imageFile.setName(name);
-                    content.getImageFiles().add(imageFile);
-                }
+            Content contentbd = db.selectContentById(content.getUrl().hashCode());
+            if (contentbd == null) {
+                Log.i(TAG, "Saving content : " + content.getUrl());
+                try {
+                    content.setImageFiles(new ArrayList<ImageFile>(content.getQtyPages()));
+                    String urlCdn = "http://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/")) + "/images/";
+                    for (int i = 1; i <= content.getQtyPages(); i++) {
+                        String name = String.format("%03d", i) + ".jpg";
+                        ImageFile imageFile = new ImageFile();
+                        imageFile.setUrl(urlCdn + name);
+                        imageFile.setOrder(i);
+                        imageFile.setStatus(Status.SAVED);
+                        imageFile.setName(name);
+                        content.getImageFiles().add(imageFile);
+                    }
 
-                new FakkuDroidDB(MainActivity.this).insertContent(content);
-            }catch (Exception e){
-                Log.e(TAG, "Saving content", e);
-                return;
+                    db.insertContent(content);
+                } catch (Exception e) {
+                    Log.e(TAG, "Saving content", e);
+                    return;
+                }
             }
-            if(content.getPublishers()==null) {
+            if (content.getPublishers() == null) {
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.show();
             }
