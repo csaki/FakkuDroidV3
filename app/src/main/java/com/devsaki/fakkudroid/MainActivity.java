@@ -1,17 +1,41 @@
 package com.devsaki.fakkudroid;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import com.devsaki.fakku.dto.Content;
+import com.melnykov.fab.FloatingActionButton;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private final String FAKKU_URL = "https://www.fakku.net";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        WebView webview = (WebView) findViewById(R.id.wbMain);
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.setWebViewClient(new CustomWebViewClient());
+        webview.addJavascriptInterface(new FakkuLoadListener(), "HTMLOUT");
+        webview.loadUrl(FAKKU_URL);
+        FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+        fabDownload.hide(true);
     }
 
 
@@ -35,5 +59,64 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(event.getAction() == KeyEvent.ACTION_DOWN){
+            switch(keyCode)
+            {
+                case KeyEvent.KEYCODE_BACK:
+                    WebView webview = (WebView) findViewById(R.id.wbMain);
+                    if(webview.canGoBack()){
+                        webview.goBack();
+                    }else{
+                        finish();
+                    }
+                    return true;
+            }
+
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    class CustomWebViewClient extends WebViewClient {
+
+        public boolean shouldOverrideUrlLoading(WebView view, String url)
+        {
+            try {
+                URL u = new URL(url);
+                if(u.getHost().equals("www.fakku.net")){
+                    view.loadUrl(url);
+                    return false;
+                }else{
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                    return true;
+                }
+            } catch (MalformedURLException e) {}
+            return super.shouldOverrideUrlLoading(view, url);
+        }
+
+        public void onPageFinished(WebView view, String url) {
+            if(url.startsWith("https://www.fakku.net/manga/")||url.startsWith("https://www.fakku.net/doujinshi/")) {
+                view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
+            }else{
+                FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+                fabDownload.hide();
+            }
+
+        }
+    }
+
+    class  FakkuLoadListener{
+
+        @JavascriptInterface
+        public void processHTML(String html)
+        {
+            FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+            fabDownload.show();
+        }
     }
 }
