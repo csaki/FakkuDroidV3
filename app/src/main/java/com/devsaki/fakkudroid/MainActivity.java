@@ -1,19 +1,19 @@
 package com.devsaki.fakkudroid;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.devsaki.fakku.dto.Content;
+import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.net.MalformedURLException;
@@ -99,14 +99,18 @@ public class MainActivity extends ActionBarActivity {
             return super.shouldOverrideUrlLoading(view, url);
         }
 
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon)
+        {
+            FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+            fabDownload.hide();
+        }
+
+        @Override
         public void onPageFinished(WebView view, String url) {
             if(url.startsWith("https://www.fakku.net/manga/")||url.startsWith("https://www.fakku.net/doujinshi/")) {
                 view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
-            }else{
-                FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-                fabDownload.hide();
             }
-
         }
     }
 
@@ -115,6 +119,8 @@ public class MainActivity extends ActionBarActivity {
         @JavascriptInterface
         public void processHTML(String html)
         {
+            Content content = FakkuParser.parseContent(html);
+
             FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
             fabDownload.show();
         }
