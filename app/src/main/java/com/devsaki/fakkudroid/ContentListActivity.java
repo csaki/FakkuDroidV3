@@ -1,5 +1,6 @@
 package com.devsaki.fakkudroid;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+
+import com.melnykov.fab.FloatingActionButton;
 
 
 public class ContentListActivity extends ActionBarActivity {
@@ -60,6 +63,14 @@ public class ContentListActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_content_list, container, false);
+            FloatingActionButton fabBrowser = (FloatingActionButton) rootView.findViewById(R.id.fabBrowser);
+            fabBrowser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent mainActivity = new Intent(getActivity(), MainActivity.class);
+                    startActivity(mainActivity);
+                }
+            });
             return rootView;
         }
     }

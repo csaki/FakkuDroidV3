@@ -20,7 +20,6 @@ public class Content extends ContentTable{
     private Attribute language;
     private List<Attribute> tags;
     private List<Attribute> translators;
-    @Expose(serialize = false, deserialize = false)
     private String coverImageUrl;
     @Expose(serialize = false, deserialize = false)
     private String sampleImageUrl;

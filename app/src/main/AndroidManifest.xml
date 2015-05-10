@@ -11,19 +11,24 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:name=".ContentListActivity"
+            android:label="@string/title_activity_content_list"
+            android:launchMode= "singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ContentListActivity"
-            android:label="@string/title_activity_content_list" >
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
         </activity>
+        <service
+            android:name=".service.DownloadManagerService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

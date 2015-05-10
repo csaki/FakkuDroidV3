@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -43,10 +44,20 @@ public class MainActivity extends ActionBarActivity {
         webview.setWebViewClient(new CustomWebViewClient());
         webview.addJavascriptInterface(new FakkuLoadListener(), "HTMLOUT");
         webview.loadUrl(FAKKU_URL);
+
         FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
         fabDownload.hide(true);
 
         db = new FakkuDroidDB(MainActivity.this);
+
+        FloatingActionButton fabDownloads = (FloatingActionButton) findViewById(R.id.fabDownloads);
+        fabDownloads.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(MainActivity.this, ContentListActivity.class);
+                startActivity(mainActivity);
+            }
+        });
     }
 
 
