@@ -27,10 +27,11 @@ public class Content extends ContentTable{
     private Integer qtyPages;
     @Expose(serialize = false, deserialize = false)
     private Integer qtyFavorites;
-    private Long uploadDate;
+    private long uploadDate;
     private Attribute user;
-    private Long downloadDate;
+    private long downloadDate;
     private Status status;
+    private List<ImageFile> imageFiles;
 
     public Integer getId() {
         return url.hashCode();
@@ -156,19 +157,19 @@ public class Content extends ContentTable{
         this.user = user;
     }
 
-    public Long getUploadDate() {
+    public long getUploadDate() {
         return uploadDate;
     }
 
-    public void setUploadDate(Long uploadDate) {
+    public void setUploadDate(long uploadDate) {
         this.uploadDate = uploadDate;
     }
 
-    public Long getDownloadDate() {
+    public long getDownloadDate() {
         return downloadDate;
     }
 
-    public void setDownloadDate(Long downloadDate) {
+    public void setDownloadDate(long downloadDate) {
         this.downloadDate = downloadDate;
     }
 
@@ -178,6 +179,14 @@ public class Content extends ContentTable{
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public List<ImageFile> getImageFiles() {
+        return imageFiles;
+    }
+
+    public void setImageFiles(List<ImageFile> imageFiles) {
+        this.imageFiles = imageFiles;
     }
 
     @Override

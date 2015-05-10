@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,16 +13,21 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
 
+    private static final String TAG = "MainActivity";
     private final String FAKKU_URL = "https://www.fakku.net";
 
     @Override
@@ -120,9 +126,32 @@ public class MainActivity extends ActionBarActivity {
         public void processHTML(String html)
         {
             Content content = FakkuParser.parseContent(html);
+            if(content==null){
+                return;
+            }
+            Log.i(TAG, "Saving content : " + content.getUrl());
+            try {
+                content.setImageFiles(new ArrayList<ImageFile>(content.getQtyPages()));
+                String urlCdn = "http://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/"))+ "/images/";
+                for(int i = 1; i <=content.getQtyPages();i++){
+                    String name = String.format("%03d", i) + ".jpg";
+                    ImageFile imageFile = new ImageFile();
+                    imageFile.setUrl(urlCdn + name);
+                    imageFile.setOrder(i);
+                    imageFile.setStatus(Status.SAVED);
+                    imageFile.setName(name);
+                    content.getImageFiles().add(imageFile);
+                }
 
-            FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-            fabDownload.show();
+                new FakkuDroidDB(MainActivity.this).insertContent(content);
+            }catch (Exception e){
+                Log.e(TAG, "Saving content", e);
+                return;
+            }
+            if(content.getPublishers()==null) {
+                FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+                fabDownload.show();
+            }
         }
     }
 }

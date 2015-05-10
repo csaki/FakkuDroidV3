@@ -75,6 +75,7 @@ public class FakkuParser {
                 result.setUser(new Attribute());
                 result.getUser().setUrl(user.first().attr("href"));
                 result.getUser().setName(user.first().html());
+                result.getUser().setType(AttributeType.UPLOADER);
             }
             String date = uploader.html().substring(uploader.html().lastIndexOf(" on ") + 4).trim();
 

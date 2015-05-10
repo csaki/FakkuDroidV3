@@ -16,5 +16,5 @@ public abstract class AttributeTable {
             + ID_COLUMN + " INTEGER PRIMARY KEY," + URL_COLUMN + " TEXT,"
             + NAME_COLUMN + " TEXT" + "," + TYPE_COLUMN + " INTEGER" + ")";
 
-    public static final String INSERT_STATEMENT = "INSERT OR REPLACE INTO "+ TABLE_NAME +" VALUES (?,?,?,?);";
+    public static final String INSERT_STATEMENT = "INSERT OR IGNORE INTO "+ TABLE_NAME +" VALUES (?,?,?,?);";
 }

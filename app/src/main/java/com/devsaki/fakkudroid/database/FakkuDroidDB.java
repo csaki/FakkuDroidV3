@@ -9,8 +9,10 @@ import android.database.sqlite.SQLiteStatement;
 import com.devsaki.fakkudroid.database.contants.AttributeTable;
 import com.devsaki.fakkudroid.database.contants.ContentAttributeTable;
 import com.devsaki.fakkudroid.database.contants.ContentTable;
+import com.devsaki.fakkudroid.database.contants.ImageFileTable;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.database.domains.ImageFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         db.execSQL(ContentTable.CREATE_TABLE);
         db.execSQL(AttributeTable.CREATE_TABLE);
         db.execSQL(ContentAttributeTable.CREATE_TABLE);
+        db.execSQL(ImageFileTable.CREATE_TABLE);
     }
 
     @Override
@@ -43,6 +46,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + ContentAttributeTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AttributeTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ContentTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ImageFileTable.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -71,6 +75,8 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 statement.bindLong(indexColumn++, row.getDownloadDate());
                 statement.bindLong(indexColumn++, row.getStatus().getCode());
                 statement.execute();
+
+                insertImageFiles(db, row);
 
                 List<Attribute> attributes = new ArrayList<>();
                 if (row.getSerie() != null)
@@ -115,6 +121,22 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             statementContentAttribute.bindLong(1, content.getId());
             statementContentAttribute.bindLong(2, row.getId());
             statementContentAttribute.execute();
+        }
+    }
+
+    private void insertImageFiles(SQLiteDatabase db, Content content) {
+        SQLiteStatement statement = db.compileStatement(ImageFileTable.INSERT_STATEMENT);
+
+        for (ImageFile row : content.getImageFiles()) {
+            int indexColumn = 1;
+            statement.clearBindings();
+            statement.bindLong(indexColumn++, row.getId());
+            statement.bindLong(indexColumn++, content.getId());
+            statement.bindLong(indexColumn++, row.getOrder());
+            statement.bindString(indexColumn++, row.getUrl());
+            statement.bindString(indexColumn++, row.getName());
+            statement.bindLong(indexColumn++, row.getStatus().getCode());
+            statement.execute();
         }
     }
 }

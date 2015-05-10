@@ -6,12 +6,16 @@ import com.devsaki.fakkudroid.database.enums.Status;
 /**
  * Created by DevSaki on 10/05/2015.
  */
-public class ImageFile extends ImageFileTable{
+public class ImageFile extends ImageFileTable {
 
     private Integer order;
     private String url;
     private String name;
     private Status status;
+
+    public Integer getId() {
+        return url.hashCode();
+    }
 
     public Integer getOrder() {
         return order;

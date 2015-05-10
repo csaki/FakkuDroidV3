@@ -5,7 +5,7 @@ package com.devsaki.fakkudroid.database.enums;
  */
 public enum AttributeType {
 
-    ARTIST(0, "Artist"), PUBLISHER(1, "Publisher"), LANGUAGE(2, "Language"), TAG(3, "Tag"), TRANSLATOR(4, "Translator"), SERIE(5, "Serie");
+    ARTIST(0, "Artist"), PUBLISHER(1, "Publisher"), LANGUAGE(2, "Language"), TAG(3, "Tag"), TRANSLATOR(4, "Translator"), SERIE(5, "Serie"), UPLOADER(6, "Serie");
 
     private int code;
     private String description;
