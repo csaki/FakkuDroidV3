@@ -224,7 +224,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    private void updateImageFileStatus(ImageFile row) {
+    public void updateImageFileStatus(ImageFile row) {
         SQLiteDatabase db = this.getWritableDatabase();
         db = this.getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(ImageFileTable.UPDATE_IMAGE_FILE_STATUS_STATEMENT);
@@ -243,14 +243,15 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         }
     }
 
-    private void updateContentStatus(Content row) {
+    public void updateContentStatus(Content row) {
         SQLiteDatabase db = this.getWritableDatabase();
         db = this.getWritableDatabase();
-        SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_STATUS_STATEMENT);
+        SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT);
         db.beginTransaction();
         try {
             int indexColumn = 1;
             statement.clearBindings();
+            statement.bindLong(indexColumn++, row.getDownloadDate());
             statement.bindLong(indexColumn++, row.getStatus().getCode());
             statement.bindLong(indexColumn++, row.getId());
             statement.execute();

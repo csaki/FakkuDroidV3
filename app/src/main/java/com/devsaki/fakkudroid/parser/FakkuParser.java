@@ -52,6 +52,13 @@ public class FakkuParser {
             result.setSerie(parseAttribute(rows.get(rowIndex++).select("a").first(), AttributeType.SERIE));
             //Artist
             result.setArtists(parseAttributes(rows.get(rowIndex++).select("a"), AttributeType.ARTIST));
+
+            if(rows.get(rowIndex).select("div.left").html().equals("Event")){
+                rowIndex++;
+            }
+            if(rows.get(rowIndex).select("div.left").html().equals("Magazine")){
+                rowIndex++;
+            }
             //Publisher or Translator
             if(rows.get(rowIndex).select("div.left").html().equals("Publisher")){
                 result.setPublishers(parseAttributes(rows.get(rowIndex++).select("a"), AttributeType.PUBLISHER));

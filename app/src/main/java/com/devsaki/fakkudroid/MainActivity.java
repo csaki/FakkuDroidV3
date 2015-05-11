@@ -11,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = MainActivity.class.getName();
     private final String FAKKU_URL = "https://www.fakku.net";
 
     private FakkuDroidDB db;
@@ -42,6 +44,14 @@ public class MainActivity extends ActionBarActivity {
         WebView webview = (WebView) findViewById(R.id.wbMain);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new CustomWebViewClient());
+        webview.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                ProgressBar pb = (ProgressBar) findViewById(R.id.pbMain);
+                pb.setProgress(newProgress);
+            }
+        });
         webview.addJavascriptInterface(new FakkuLoadListener(), "HTMLOUT");
         webview.loadUrl(FAKKU_URL);
 

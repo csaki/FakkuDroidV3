@@ -27,7 +27,8 @@ public abstract class ContentTable {
             + STATUS_COLUMN + " INTEGER"+ "," + COVER_IMAGE_URL_COLUMN + " TEXT" + ")";
 
     public static final String INSERT_STATEMENT = "INSERT OR REPLACE INTO " + TABLE_NAME + " VALUES (?,?,?,?,?,?,?,?,?,?,?);";
-    public static final String UPDATE_CONTENT_STATUS_STATEMENT = "UPDATE " + TABLE_NAME + " SET " + STATUS_COLUMN + " = ? WHERE " + ID_COLUMN + " = ?";
+    public static final String UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT = "UPDATE " + TABLE_NAME + " SET " + DOWNLOAD_DATE_COLUMN + " = ?, " + STATUS_COLUMN
+            + " = ? WHERE " + ID_COLUMN + " = ?";
 
     public static final String SELECT_BY_CONTENT_ID = "SELECT " + ID_COLUMN + ", " + FAKKU_ID_COLUMN + ", " + CATEGORY_COLUMN + ", " + URL_COLUMN + ", "
             + TITLE_COLUMN + ", " + HTML_DESCRIPTION_COLUMN + ", " + QTY_PAGES_COLUMN + ", "

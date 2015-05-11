@@ -5,7 +5,7 @@ package com.devsaki.fakkudroid.database.enums;
  */
 public enum Status {
 
-    SAVED(0, "Saved"), DOWNLOADED(1, "Downloaded"), DOWNLOADING(2, "Downloading"), PAUSED(3, "Paused"), ERROR(4, "Error"), MIGRATED(5, "Migrated");
+    SAVED(0, "Saved"), DOWNLOADED(1, "Downloaded"), DOWNLOADING(2, "Downloading"), PAUSED(3, "Paused"), ERROR(4, "Error"), MIGRATED(5, "Migrated"), IGNORED(6, "Ignored");
 
     private int code;
     private String description;
