@@ -98,6 +98,9 @@ public class FakkuParser {
             //Tags
             result.setTags(parseAttributes(rows.get(rowIndex++).select("a"), AttributeType.TAG));
             result.setStatus(Status.SAVED);
+
+            //IsDownloadable
+            result.setDownloadable(doc.select(".button.green:contains(Read Online)").size()>0);
         }
         return result;
     }

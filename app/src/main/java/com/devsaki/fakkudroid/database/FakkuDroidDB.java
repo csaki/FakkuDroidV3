@@ -203,26 +203,30 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    public Content selectContentByQuery(String query) {
-        Content result = null;
+    public List<Content> selectContentByQuery(String query) {
+        List<Content> result  = null;
         SQLiteDatabase db = null;
         try {
-
+            query = "%" + query + "%";
             db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", query, query});
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", query, query, AttributeType.ARTIST + "", AttributeType.TAG + "", AttributeType.SERIE + ""});
 
-            // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
-                int indexColumn = 3;
-                result = new Content();
-                result.setUrl(cursor.getString(indexColumn++));
-                result.setTitle(cursor.getString(indexColumn++));
-                result.setHtmlDescription(cursor.getString(indexColumn++));
-                result.setQtyPages(cursor.getInt(indexColumn++));
-                result.setUploadDate(cursor.getLong(indexColumn++));
-                result.setDownloadDate(cursor.getLong(indexColumn++));
-                result.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                result.setCoverImageUrl(cursor.getString(indexColumn++));
+                result = new ArrayList<>();
+                do{
+                    int indexColumn = 3;
+                    Content content = new Content();
+                    content.setUrl(cursor.getString(indexColumn++));
+                    content.setTitle(cursor.getString(indexColumn++));
+                    content.setHtmlDescription(cursor.getString(indexColumn++));
+                    content.setQtyPages(cursor.getInt(indexColumn++));
+                    content.setUploadDate(cursor.getLong(indexColumn++));
+                    content.setDownloadDate(cursor.getLong(indexColumn++));
+                    content.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                    content.setCoverImageUrl(cursor.getString(indexColumn++));
+
+                    result.add(content);
+                }while (cursor.moveToNext());
             }
         } finally {
             if (db != null && db.isOpen())

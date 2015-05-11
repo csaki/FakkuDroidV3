@@ -207,7 +207,7 @@ public class MainActivity extends ActionBarActivity {
                     return;
                 }
             }
-            if (content.getPublishers() == null) {
+            if (content.isDownloadable()) {
                 currentContent = contentbd;
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.show();

@@ -6,6 +6,11 @@
     <string name="title_activity_content_list">ContentListActivity</string>
     <string name="title_activity_download_manager">DownloadManagerActivity</string>
 
+    <string name="read">Read</string>
+    <string name="view_browser">View in Browser</string>
+    <string name="delete">Delete</string>
 
-    <string name="notification_downloading">DownloadManagerActivity</string>
+    <string name="tvSeries"><![CDATA[<b>Serie:</b> @serie@]]></string>
+    <string name="tvArtists"><![CDATA[<b>Artist:</b> @artist@]]></string>
+    <string name="tvTags"><![CDATA[<b>@tag@</b>]]></string>
 </resources>

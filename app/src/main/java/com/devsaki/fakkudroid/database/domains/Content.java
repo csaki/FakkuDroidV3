@@ -31,6 +31,8 @@ public class Content extends ContentTable{
     private long downloadDate;
     private Status status;
     private List<ImageFile> imageFiles;
+    @Expose(serialize = false, deserialize = false)
+    private boolean isDownloadable;
 
     public Integer getId() {
         return url.hashCode();
@@ -186,6 +188,14 @@ public class Content extends ContentTable{
 
     public void setImageFiles(List<ImageFile> imageFiles) {
         this.imageFiles = imageFiles;
+    }
+
+    public boolean isDownloadable() {
+        return isDownloadable;
+    }
+
+    public void setDownloadable(boolean isDownloadable) {
+        this.isDownloadable = isDownloadable;
     }
 
     @Override
