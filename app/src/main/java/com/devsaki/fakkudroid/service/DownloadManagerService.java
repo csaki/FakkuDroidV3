@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.devsaki.fakkudroid.ContentListActivity;
 import com.devsaki.fakkudroid.DownloadManagerActivity;
@@ -64,7 +63,6 @@ public class DownloadManagerService extends IntentService {
         //Directory
         File dir = Helper.getDir(content.getFakkuId(), DownloadManagerService.this);
 
-        Toast.makeText(this, getResources().getString(R.string.starting_download).replace("@content", content.getTitle()), Toast.LENGTH_SHORT).show();
         try {
             //Download Cover Image
             Helper.saveInStorage(new File(dir, "thumb.jpg"), content.getCoverImageUrl());
@@ -115,7 +113,6 @@ public class DownloadManagerService extends IntentService {
         db.updateContentStatus(content);
         Log.i(TAG, "Finish Download Content : " + content.getTitle());
         showNotification(0, content);
-        Toast.makeText(this, getResources().getString(R.string.completed_download).replace("@content", content.getTitle()), Toast.LENGTH_SHORT).show();
         content = db.selectContentByStatus(Status.DOWNLOADING);
         if(content!=null){
             Intent intentService = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
