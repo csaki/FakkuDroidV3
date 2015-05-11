@@ -45,14 +45,13 @@ public class Helper {
 
     public static File getDefaultDir(String dir, Context context){
         File file = null;
-        if (file == null)
-            try {
-                file = new File(Environment.getRootDirectory()
-                        + Constants.LOCAL_DIRECTORY + "/" + dir);
-            }catch (Exception e){
-                file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
-                file = new File(file, Constants.LOCAL_DIRECTORY);
-            }
+        try {
+            file = new File(Environment.getExternalStorageDirectory()
+                    + Constants.LOCAL_DIRECTORY + "/" + dir);
+        }catch (Exception e){
+            file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
+            file = new File(file, Constants.LOCAL_DIRECTORY);
+        }
 
         if (!file.exists()) {
             if(!file.mkdirs()){
@@ -114,18 +113,21 @@ public class Helper {
 
         try {
             if (!file.exists()) {
+                final int BUFFER_SIZE = 23 * 1024;
+
                 URL url = new URL(imageUrl);
 
                 URLConnection connection = url.openConnection();
+                connection.setDoInput(true);
                 connection.connect();
 
-                input = new BufferedInputStream(url.openStream());
+                input = new BufferedInputStream(url.openStream(), BUFFER_SIZE);
 
                 output = new FileOutputStream(file);
 
-                byte data[] = new byte[1024];
+                byte data[] = new byte[BUFFER_SIZE];
                 int count;
-                while ((count = input.read(data)) != -1) {
+                while ((count = input.read(data, 0, BUFFER_SIZE)) != -1) {
                     output.write(data, 0, count);
                 }
                 output.flush();

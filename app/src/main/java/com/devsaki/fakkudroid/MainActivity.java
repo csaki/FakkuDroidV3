@@ -22,11 +22,13 @@ import com.devsaki.fakkudroid.database.domains.ImageFile;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
+import com.devsaki.fakkudroid.service.DownloadManagerService;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -35,6 +37,7 @@ public class MainActivity extends ActionBarActivity {
     private final String FAKKU_URL = "https://www.fakku.net";
 
     private FakkuDroidDB db;
+    private Content currentContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,12 @@ public class MainActivity extends ActionBarActivity {
         webview.loadUrl(FAKKU_URL);
 
         FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+        fabDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadContent();
+            }
+        });
         fabDownload.hide(true);
 
         db = new FakkuDroidDB(MainActivity.this);
@@ -91,6 +100,27 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void downloadContent(){
+
+        if(Status.DOWNLOADING==currentContent.getStatus()){
+
+            return;
+        }
+        if(Status.PAUSED==currentContent.getStatus()){
+
+            return;
+        }
+        if(Status.DOWNLOADED==currentContent.getStatus()){
+
+            return;
+        }
+        currentContent.setDownloadDate(new Date().getTime());
+        currentContent.setStatus(Status.DOWNLOADING);
+        db.updateContentStatus(currentContent);
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
+        startService(intent);
     }
 
     @Override
@@ -154,10 +184,12 @@ public class MainActivity extends ActionBarActivity {
             }
             Content contentbd = db.selectContentById(content.getUrl().hashCode());
             if (contentbd == null) {
+                contentbd = content;
                 Log.i(TAG, "Saving content : " + content.getUrl());
                 try {
                     content.setImageFiles(new ArrayList<ImageFile>(content.getQtyPages()));
                     String urlCdn = "http://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/")) + "/images/";
+                    content.setCoverImageUrl("http://" + content.getCoverImageUrl().substring(2));
                     for (int i = 1; i <= content.getQtyPages(); i++) {
                         String name = String.format("%03d", i) + ".jpg";
                         ImageFile imageFile = new ImageFile();
@@ -175,6 +207,7 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
             if (content.getPublishers() == null) {
+                currentContent = contentbd;
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.show();
             }

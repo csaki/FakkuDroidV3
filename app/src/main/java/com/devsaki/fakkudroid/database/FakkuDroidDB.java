@@ -60,10 +60,11 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void insertContents(Content[] rows) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        SQLiteStatement statement = db.compileStatement(Content.INSERT_STATEMENT);
-        db.beginTransaction();
+        SQLiteDatabase db = null;
         try {
+            db = this.getWritableDatabase();
+            SQLiteStatement statement = db.compileStatement(Content.INSERT_STATEMENT);
+            db.beginTransaction();
             for (Content row : rows) {
                 int indexColumn = 1;
                 statement.clearBindings();
@@ -146,7 +147,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
     public Content selectContentById(int id) {
         Content result = null;
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
 
             db = this.getWritableDatabase();
@@ -173,23 +174,54 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
+    public Content selectContentByStatus(Status status) {
+        Content result = null;
+        SQLiteDatabase db = null;
+        try {
+
+            db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                int indexColumn = 3;
+                result = new Content();
+                result.setUrl(cursor.getString(indexColumn++));
+                result.setTitle(cursor.getString(indexColumn++));
+                result.setHtmlDescription(cursor.getString(indexColumn++));
+                result.setQtyPages(cursor.getInt(indexColumn++));
+                result.setUploadDate(cursor.getLong(indexColumn++));
+                result.setDownloadDate(cursor.getLong(indexColumn++));
+                result.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                result.setCoverImageUrl(cursor.getString(indexColumn++));
+            }
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+
+        return result;
+    }
+
     public List<ImageFile> selectImageFilesByContentId(int id) {
         List<ImageFile> result = new ArrayList<>();
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
 
             db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
             // looping through all rows and adding to list
-            while (cursor.moveToFirst()) {
-                int indexColumn = 2;
-                ImageFile item = new ImageFile();
-                item.setOrder(cursor.getInt(indexColumn++));
-                item.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                item.setUrl(cursor.getString(indexColumn++));
-                item.setName(cursor.getString(indexColumn++));
-                result.add(item);
+            if (cursor.moveToFirst()) {
+                do{
+                    int indexColumn = 2;
+                    ImageFile item = new ImageFile();
+                    item.setOrder(cursor.getInt(indexColumn++));
+                    item.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                    item.setUrl(cursor.getString(indexColumn++));
+                    item.setName(cursor.getString(indexColumn++));
+                    result.add(item);
+                }while (cursor.moveToNext());
             }
         } finally {
             if (db != null && db.isOpen())
@@ -201,20 +233,22 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
     public List<Attribute> selectAttributeByContentId(int id, AttributeType type) {
         List<Attribute> result = new ArrayList<>();
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
 
             db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + "", type.getCode() + ""});
 
             // looping through all rows and adding to list
-            while (cursor.moveToFirst()) {
-                int indexColumn = 1;
-                Attribute item = new Attribute();
-                item.setUrl(cursor.getString(indexColumn++));
-                item.setName(cursor.getString(indexColumn++));
-                item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
-                result.add(item);
+            if (cursor.moveToFirst()) {
+                do{
+                    int indexColumn = 1;
+                    Attribute item = new Attribute();
+                    item.setUrl(cursor.getString(indexColumn++));
+                    item.setName(cursor.getString(indexColumn++));
+                    item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
+                    result.add(item);
+                }while (cursor.moveToNext());
             }
         } finally {
             if (db != null && db.isOpen())
@@ -225,11 +259,11 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void updateImageFileStatus(ImageFile row) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db = this.getWritableDatabase();
-        SQLiteStatement statement = db.compileStatement(ImageFileTable.UPDATE_IMAGE_FILE_STATUS_STATEMENT);
-        db.beginTransaction();
+        SQLiteDatabase db = null;
         try {
+            db = this.getWritableDatabase();
+            SQLiteStatement statement = db.compileStatement(ImageFileTable.UPDATE_IMAGE_FILE_STATUS_STATEMENT);
+            db.beginTransaction();
             int indexColumn = 1;
             statement.clearBindings();
             statement.bindLong(indexColumn++, row.getStatus().getCode());
@@ -244,11 +278,11 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void updateContentStatus(Content row) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db = this.getWritableDatabase();
-        SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT);
-        db.beginTransaction();
+        SQLiteDatabase db = null;
         try {
+            db = this.getWritableDatabase();
+            SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT);
+            db.beginTransaction();
             int indexColumn = 1;
             statement.clearBindings();
             statement.bindLong(indexColumn++, row.getDownloadDate());
