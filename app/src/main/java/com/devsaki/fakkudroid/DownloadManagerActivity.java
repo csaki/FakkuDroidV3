@@ -5,13 +5,19 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.devsaki.fakkudroid.database.FakkuDroidDB;
+
 
 public class DownloadManagerActivity extends ActionBarActivity {
+
+    private static final String TAG = DownloadManagerActivity.class.getName();
+    private FakkuDroidDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manager);
+        db = new FakkuDroidDB(this);
     }
 
     @Override

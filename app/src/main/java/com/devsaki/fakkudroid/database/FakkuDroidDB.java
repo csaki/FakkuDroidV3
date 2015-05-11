@@ -203,6 +203,35 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
+    public Content selectContentByQuery(String query) {
+        Content result = null;
+        SQLiteDatabase db = null;
+        try {
+
+            db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", query, query});
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                int indexColumn = 3;
+                result = new Content();
+                result.setUrl(cursor.getString(indexColumn++));
+                result.setTitle(cursor.getString(indexColumn++));
+                result.setHtmlDescription(cursor.getString(indexColumn++));
+                result.setQtyPages(cursor.getInt(indexColumn++));
+                result.setUploadDate(cursor.getLong(indexColumn++));
+                result.setDownloadDate(cursor.getLong(indexColumn++));
+                result.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                result.setCoverImageUrl(cursor.getString(indexColumn++));
+            }
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+
+        return result;
+    }
+
     public List<ImageFile> selectImageFilesByContentId(int id) {
         List<ImageFile> result = new ArrayList<>();
         SQLiteDatabase db = null;

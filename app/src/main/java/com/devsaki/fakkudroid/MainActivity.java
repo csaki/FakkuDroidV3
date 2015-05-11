@@ -15,6 +15,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
@@ -47,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
         WebView webview = (WebView) findViewById(R.id.wbMain);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new CustomWebViewClient());
-        webview.setWebChromeClient(new WebChromeClient(){
+        webview.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
@@ -102,22 +103,22 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void downloadContent(){
+    private void downloadContent() {
 
-        if(Status.DOWNLOADING==currentContent.getStatus()){
-
+        if (Status.DOWNLOADING == currentContent.getStatus() && DownloadManagerService.isStarted()) {
+            Toast.makeText(this, R.string.starting_download_manager, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
+            startService(intent);
             return;
         }
-        if(Status.PAUSED==currentContent.getStatus()){
-
+        if (Status.DOWNLOADED == currentContent.getStatus()) {
+            Toast.makeText(this, R.string.already_downloaded, Toast.LENGTH_SHORT).show();
             return;
         }
-        if(Status.DOWNLOADED==currentContent.getStatus()){
-
-            return;
-        }
+        Toast.makeText(this, R.string.in_queue, Toast.LENGTH_SHORT).show();
         currentContent.setDownloadDate(new Date().getTime());
         currentContent.setStatus(Status.DOWNLOADING);
+
         db.updateContentStatus(currentContent);
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
         startService(intent);

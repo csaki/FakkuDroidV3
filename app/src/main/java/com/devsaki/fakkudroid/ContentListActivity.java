@@ -12,10 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
 
+import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.melnykov.fab.FloatingActionButton;
 
 
 public class ContentListActivity extends ActionBarActivity {
+
+    private static final String TAG = ContentListActivity.class.getName();
+    private FakkuDroidDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +30,7 @@ public class ContentListActivity extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        db = new FakkuDroidDB(this);
     }
 
 

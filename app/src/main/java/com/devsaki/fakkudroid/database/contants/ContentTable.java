@@ -1,5 +1,7 @@
 package com.devsaki.fakkudroid.database.contants;
 
+import com.devsaki.fakkudroid.database.domains.Attribute;
+
 /**
  * Created by DevSaki on 10/05/2015.
  */
@@ -38,4 +40,13 @@ public abstract class ContentTable {
             + URL_COLUMN + ", " + TITLE_COLUMN + ", " + HTML_DESCRIPTION_COLUMN + ", " + QTY_PAGES_COLUMN + ", "
             + UPLOAD_DATE_COLUMN + ", " + DOWNLOAD_DATE_COLUMN + ", " + STATUS_COLUMN  + ", " + COVER_IMAGE_URL_COLUMN
             + " FROM " + TABLE_NAME + " C WHERE C." + STATUS_COLUMN + " = ? ORDER BY C." + DOWNLOAD_DATE_COLUMN;
+
+    public static final String SELECT_DOWNLOADS = "SELECT C." + ID_COLUMN + ", C." + FAKKU_ID_COLUMN + ", C." + CATEGORY_COLUMN + ", C."
+            + URL_COLUMN + ", C." + TITLE_COLUMN + ", C." + HTML_DESCRIPTION_COLUMN + ", C." + QTY_PAGES_COLUMN + ", C."
+            + UPLOAD_DATE_COLUMN + ", C." + DOWNLOAD_DATE_COLUMN + ", C." + STATUS_COLUMN  + ", C." + COVER_IMAGE_URL_COLUMN
+            + " FROM " + TABLE_NAME + " C INNER JOIN " + ContentAttributeTable.TABLE_NAME + " CA ON C." + ID_COLUMN
+            + " = CA." + ContentAttributeTable.CONTENT_ID_COLUMN + " INNER JOIN " + AttributeTable.TABLE_NAME + " A ON CA."
+            + ContentAttributeTable.ATTRIBUTE_ID_COLUMN + " = A." + AttributeTable.ID_COLUMN + " WHERE C." + STATUS_COLUMN
+            + " in (?, ?) AND C." + TITLE_COLUMN + " like ? AND A." + AttributeTable.NAME_COLUMN + " like ? ORDER BY C." + STATUS_COLUMN
+            + ", C." + DOWNLOAD_DATE_COLUMN + " DESC";
 }

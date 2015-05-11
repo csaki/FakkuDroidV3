@@ -24,19 +24,33 @@ import java.io.IOException;
 import java.util.Date;
 
 public class DownloadManagerService extends IntentService {
-    private NotificationManager notificationManager;
-    NotificationCompat.Builder mBuilder;
 
     private static final String TAG = DownloadManagerService.class.getName();
+    private static boolean started = false;
+
+    private NotificationManager notificationManager;
+    private NotificationCompat.Builder mBuilder;
     private FakkuDroidDB db;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate");
+        started = true;
 
         db = new FakkuDroidDB(this);
         notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy");
+        started = false;
+    }
+
+    public static boolean isStarted() {
+        return started;
     }
 
     public DownloadManagerService() {
