@@ -5,4 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_content_list">ContentListActivity</string>
     <string name="title_activity_download_manager">DownloadManagerActivity</string>
+
+
+    <string name="notification_downloading">DownloadManagerActivity</string>
 </resources>
