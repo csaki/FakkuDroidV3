@@ -204,7 +204,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public List<Content> selectContentByQuery(String query) {
-        List<Content> result  = null;
+        List<Content> result = null;
         SQLiteDatabase db = null;
         try {
             query = "%" + query + "%";
@@ -213,7 +213,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
             if (cursor.moveToFirst()) {
                 result = new ArrayList<>();
-                do{
+                do {
                     int indexColumn = 3;
                     Content content = new Content();
                     content.setUrl(cursor.getString(indexColumn++));
@@ -226,7 +226,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                     content.setCoverImageUrl(cursor.getString(indexColumn++));
 
                     result.add(content);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
         } finally {
             if (db != null && db.isOpen())
@@ -237,7 +237,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public List<ImageFile> selectImageFilesByContentId(int id) {
-        List<ImageFile> result = new ArrayList<>();
+        List<ImageFile> result = null;
         SQLiteDatabase db = null;
         try {
 
@@ -246,7 +246,8 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
-                do{
+                result = new ArrayList<>();
+                do {
                     int indexColumn = 2;
                     ImageFile item = new ImageFile();
                     item.setOrder(cursor.getInt(indexColumn++));
@@ -254,7 +255,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                     item.setUrl(cursor.getString(indexColumn++));
                     item.setName(cursor.getString(indexColumn++));
                     result.add(item);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
         } finally {
             if (db != null && db.isOpen())
@@ -264,8 +265,15 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    public List<Attribute> selectAttributeByContentId(int id, AttributeType type) {
-        List<Attribute> result = new ArrayList<>();
+    public Attribute selectAttributeByContentId(int id, AttributeType type) {
+        List<Attribute> result = selectAttributesByContentId(id, type);
+        if (result == null)
+            return null;
+        return result.get(0);
+    }
+
+    public List<Attribute> selectAttributesByContentId(int id, AttributeType type) {
+        List<Attribute> result = null;
         SQLiteDatabase db = null;
         try {
 
@@ -274,14 +282,15 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
-                do{
+                result = new ArrayList<>();
+                do {
                     int indexColumn = 1;
                     Attribute item = new Attribute();
                     item.setUrl(cursor.getString(indexColumn++));
                     item.setName(cursor.getString(indexColumn++));
                     item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
                     result.add(item);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
         } finally {
             if (db != null && db.isOpen())

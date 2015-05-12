@@ -122,6 +122,9 @@ public class MainActivity extends ActionBarActivity {
         db.updateContentStatus(currentContent);
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
         startService(intent);
+
+        FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+        fabDownload.hide();
     }
 
     @Override

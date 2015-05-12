@@ -2,8 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,25 +23,26 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/tvSerie"
                 android:singleLine="false"
                 android:layout_gravity="center_horizontal" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/tvArtist"
                 android:singleLine="false"
                 android:layout_gravity="center_horizontal" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/tvTags"
                 android:singleLine="false"
                 android:layout_gravity="center_horizontal" />

@@ -16,6 +16,7 @@ import android.widget.SearchView;
 import com.devsaki.fakkudroid.adapters.ContentAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.util.List;
@@ -47,6 +48,11 @@ public class ContentListActivity extends ActionBarActivity {
     private void searchContent(String query){
         contents = (List<Content>) db.selectContentByQuery(query);
         if(contents!=null){
+            for (Content content : contents){
+                content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
+                content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
+                content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
+            }
             ContentAdapter adapter = new ContentAdapter(this, contents);
             setListAdapter(adapter);
         }
@@ -76,7 +82,7 @@ public class ContentListActivity extends ActionBarActivity {
 
     private ListView getListView() {
         if (mListView == null) {
-            mListView = (ListView) findViewById(android.R.id.list);
+            mListView = (ListView) findViewById(R.id.list);
         }
         return mListView;
     }

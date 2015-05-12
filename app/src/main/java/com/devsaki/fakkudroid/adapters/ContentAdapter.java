@@ -1,6 +1,7 @@
 package com.devsaki.fakkudroid.adapters;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         TextView tvTags = (TextView) rowView.findViewById(R.id.tvTags);
 
         tvTitle.setText(content.getTitle());
-        tvSerie.setText(templateTvSerie.replace("@serie@", content.getSerie().getName()));
+        tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", content.getSerie().getName())));
 
         String artists = "";
         for(int i = 0; i < content.getArtists().size(); i++){
@@ -57,7 +58,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
                 artists += ", ";
             }
         }
-        tvArtist.setText(templateTvArtist.replace("@artist@", artists));
+        tvArtist.setText(Html.fromHtml(templateTvArtist.replace("@artist@", artists)));
 
         String tags = "";
         for(int i = 0; i < content.getTags().size(); i++){
@@ -67,7 +68,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
                 tags += ", ";
             }
         }
-        tvArtist.setText(tags);
+        tvTags.setText(Html.fromHtml(tags));
 
         return rowView;
     }
