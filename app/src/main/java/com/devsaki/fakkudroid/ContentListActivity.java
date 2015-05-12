@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -17,8 +18,10 @@ import com.devsaki.fakkudroid.adapters.ContentAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
+import com.devsaki.fakkudroid.util.Helper;
 import com.melnykov.fab.FloatingActionButton;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -83,8 +86,20 @@ public class ContentListActivity extends ActionBarActivity {
     private ListView getListView() {
         if (mListView == null) {
             mListView = (ListView) findViewById(R.id.list);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if(view.getId()==R.id.btnRead){
+                        openContent(contents.get(position));
+                    }
+                }
+            });
         }
         return mListView;
+    }
+
+    private void openContent(Content content){
+
     }
 
     private void setListAdapter(ListAdapter adapter) {

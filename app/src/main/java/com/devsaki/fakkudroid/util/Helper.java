@@ -1,7 +1,9 @@
 package com.devsaki.fakkudroid.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
@@ -28,11 +30,11 @@ public class Helper {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
         String settingDir = prefs.getString(Constants.SETTINGS_DIR, "");
-        if(settingDir.isEmpty()){
+        if (settingDir.isEmpty()) {
             return getDefaultDir(dir, context);
         }
         if (!file.exists()) {
-            if(!file.mkdirs()){
+            if (!file.mkdirs()) {
                 file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
                 file = new File(settingDir + "/" + dir);
                 if (!file.exists()) {
@@ -43,18 +45,28 @@ public class Helper {
         return file;
     }
 
-    public static File getDefaultDir(String dir, Context context){
+    public static void openFile(File aFile, Context context) {
+        Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW);
+        File file = new File(aFile.getAbsolutePath());
+        String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
+        String mimetype = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        myIntent.setDataAndType(Uri.fromFile(file), mimetype);
+
+        context.startActivity(myIntent);
+    }
+
+    public static File getDefaultDir(String dir, Context context) {
         File file = null;
         try {
             file = new File(Environment.getExternalStorageDirectory()
                     + Constants.LOCAL_DIRECTORY + "/" + dir);
-        }catch (Exception e){
+        } catch (Exception e) {
             file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
             file = new File(file, Constants.LOCAL_DIRECTORY);
         }
 
         if (!file.exists()) {
-            if(!file.mkdirs()){
+            if (!file.mkdirs()) {
                 file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
                 file = new File(file, Constants.LOCAL_DIRECTORY + "/" + dir);
                 if (!file.exists()) {
@@ -66,16 +78,16 @@ public class Helper {
     }
 
     public static String escapeURL(String link) {
-        try{
+        try {
             String path = link;
             path = java.net.URLEncoder.encode(path, "utf8");
-            path = path.replace("%3A",":");
-            path = path.replace("%2F","/");
-            path = path.replace("+","%20");
-            path = path.replace("%23","#");
-            path = path.replace("%3D","=");
+            path = path.replace("%3A", ":");
+            path = path.replace("%2F", "/");
+            path = path.replace("+", "%20");
+            path = path.replace("%23", "#");
+            path = path.replace("%3D", "=");
             return path;
-        }catch(Exception e){
+        } catch (Exception e) {
             link = link.replaceAll("\\[", "%5B");
             link = link.replaceAll("\\]", "%5D");
             link = link.replaceAll("\\s", "%20");
@@ -98,7 +110,7 @@ public class Helper {
         }
     }
 
-    public static void ignoreSslErros(){
+    public static void ignoreSslErros() {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
