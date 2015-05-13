@@ -24,6 +24,7 @@ import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.devsaki.fakkudroid.service.DownloadManagerService;
+import com.devsaki.fakkudroid.util.Constants;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.net.MalformedURLException;
@@ -35,7 +36,8 @@ import java.util.Date;
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = MainActivity.class.getName();
-    private final String FAKKU_URL = "https://www.fakku.net";
+
+    public static final String INTENT_URL = "url";
 
     private FakkuDroidDB db;
     private Content currentContent;
@@ -57,7 +59,8 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         webview.addJavascriptInterface(new FakkuLoadListener(), "HTMLOUT");
-        webview.loadUrl(FAKKU_URL);
+        String intentVar = getIntent().getStringExtra(INTENT_URL);
+        webview.loadUrl(intentVar==null? Constants.FAKKU_URL:intentVar);
 
         FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
         fabDownload.setOnClickListener(new View.OnClickListener() {

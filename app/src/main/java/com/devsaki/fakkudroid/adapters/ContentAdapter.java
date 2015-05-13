@@ -1,18 +1,28 @@
 package com.devsaki.fakkudroid.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.devsaki.fakkudroid.MainActivity;
 import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.util.Constants;
+import com.devsaki.fakkudroid.util.Helper;
+import com.devsaki.fakkudroid.util.ImageQuality;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -35,7 +45,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.row_download, parent, false);
 
-        Content content = contents.get(position);
+        final Content content = contents.get(position);
 
         String templateTvSerie = context.getResources().getString(R.string.tvSeries);
         String templateTvArtist = context.getResources().getString(R.string.tvArtists);
@@ -70,6 +80,57 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         }
         tvTags.setText(Html.fromHtml(tags));
 
+        final File dir = Helper.getDir(content.getFakkuId(), getContext());
+        File coverFile = new File(dir, "thumb.jpg");
+
+        if(coverFile.exists()){
+            Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
+                    coverFile.getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
+                    ImageQuality.MEDIUM.getHeight());
+            ivCover.setImageBitmap(thumbBitmap);
+        }
+
+        Button btnRead = (Button) rowView.findViewById(R.id.btnRead);
+        btnRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readContent(content, dir);
+            }
+        });
+        Button btnDelete = (Button) rowView.findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteContent(content);
+            }
+        });
+        Button btnView = (Button) rowView.findViewById(R.id.btnViewBrowser);
+        btnView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewContent(content);
+            }
+        });
         return rowView;
+    }
+
+    private void readContent(Content content, File dir){
+        for(ImageFile imageFile : content.getImageFiles()){
+            File file = new File(dir, imageFile.getName());
+            if(file.exists()){
+                Helper.openFile(file, getContext());
+                return;
+            }
+        }
+    }
+
+    private void deleteContent(Content content){
+        Toast.makeText(getContext(), "Test click delete : " + content.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+    private void viewContent(Content content){
+        Intent intent = new Intent(getContext(), MainActivity.class);
+        intent.putExtra(MainActivity.INTENT_URL, Constants.FAKKU_URL + content.getUrl());
+
+        getContext().startActivity(intent);
     }
 }

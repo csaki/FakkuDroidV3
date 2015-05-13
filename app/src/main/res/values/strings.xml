@@ -7,7 +7,7 @@
     <string name="title_activity_download_manager">DownloadManagerActivity</string>
 
     <string name="read">Read</string>
-    <string name="view_browser">View in Browser</string>
+    <string name="view_browser">View</string>
     <string name="delete">Delete</string>
 
     <string name="tvSeries"><![CDATA[<b>Serie:</b> @serie@]]></string>
