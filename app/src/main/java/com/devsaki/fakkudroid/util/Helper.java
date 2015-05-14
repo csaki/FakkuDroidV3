@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
@@ -13,8 +14,10 @@ import android.preference.PreferenceManager;
 import com.google.gson.Gson;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,18 +30,18 @@ import java.net.URLConnection;
  */
 public class Helper {
 
-    public static File getDir(String dir, Context context) {
+    public static File getDownloadDir(String dir, Context context) {
         File file = null;
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        String settingDir = prefs.getString(Constants.SETTINGS_DIR, "");
+        String settingDir = prefs.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
         if (settingDir.isEmpty()) {
-            return getDefaultDir(dir, context);
+            return getDefaultDir(Constants.DEFAULT_DOWNLOAD_LOCAL_DIRECTORY + "/" + dir, context);
         }
+        file = new File(settingDir, Constants.DEFAULT_DOWNLOAD_LOCAL_DIRECTORY + "/" + dir);
         if (!file.exists()) {
             if (!file.mkdirs()) {
-                file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
-                file = new File(settingDir + "/" + dir);
+                file = new File(settingDir + Constants.DEFAULT_DOWNLOAD_LOCAL_DIRECTORY + "/" + dir);
                 if (!file.exists()) {
                     file.mkdirs();
                 }
@@ -48,7 +51,7 @@ public class Helper {
     }
 
     private static int calculateInSampleSize(BitmapFactory.Options options,
-                                            int reqWidth, int reqHeight) {
+                                             int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -103,16 +106,16 @@ public class Helper {
         File file = null;
         try {
             file = new File(Environment.getExternalStorageDirectory()
-                    + Constants.LOCAL_DIRECTORY + "/" + dir);
+                    + Constants.DEFAULT_LOCAL_DIRECTORY + "/" + dir);
         } catch (Exception e) {
             file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
-            file = new File(file, Constants.LOCAL_DIRECTORY);
+            file = new File(file, Constants.DEFAULT_LOCAL_DIRECTORY);
         }
 
         if (!file.exists()) {
             if (!file.mkdirs()) {
                 file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
-                file = new File(file, Constants.LOCAL_DIRECTORY + "/" + dir);
+                file = new File(file, Constants.DEFAULT_LOCAL_DIRECTORY + "/" + dir);
                 if (!file.exists()) {
                     file.mkdirs();
                 }
@@ -141,7 +144,7 @@ public class Helper {
 
     public static <K> void saveJson(K object, File dir)
             throws IOException {
-        File file = new File(dir, "content.json");
+        File file = new File(dir, Constants.JSON_FILE_NAME);
 
         if (!file.exists()) {
             Gson gson = new Gson();
@@ -152,6 +155,26 @@ public class Helper {
             writer.write(json);
             writer.close();
         }
+    }
+
+    public static String readTextFile(File f) throws IOException {
+        BufferedReader br = null;
+        String json = "";
+        try {
+
+            String sCurrentLine;
+            br = new BufferedReader(new FileReader(f));
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                json+=sCurrentLine;
+            }
+
+        } finally {
+            try {
+                if (br != null)br.close();
+            } catch (IOException ex) {}
+        }
+        return json;
     }
 
     public static void ignoreSslErros() {
@@ -203,4 +226,8 @@ public class Helper {
         }
     }
 
+    public static <T> void executeAsyncTask(AsyncTask<T, ?, ?> task,
+                                            T... params) {
+        task.execute(params);
+    }
 }

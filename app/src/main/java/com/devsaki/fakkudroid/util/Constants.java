@@ -5,8 +5,12 @@ package com.devsaki.fakkudroid.util;
  */
 public abstract class Constants {
 
-    public static final String SETTINGS_DIR = "download_dir";
-    public static final String LOCAL_DIRECTORY = "/FakkuDroid/Downloads";
+    public static final String SETTINGS_FAKKUDROID_FOLDER = "fakkudroid_folder";
+    public static final String DEFAULT_LOCAL_DIRECTORY = "/FakkuDroid";
+    public static final String DEFAULT_DOWNLOAD_LOCAL_DIRECTORY = "/Downloads";
 
     public static final String FAKKU_URL = "https://www.fakku.net";
+
+    public static final String JSON_FILE_NAME = "content.json";
+    public static final String JSON_FILE_NAME_V2 = "data.json";
 }

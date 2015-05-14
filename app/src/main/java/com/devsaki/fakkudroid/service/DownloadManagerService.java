@@ -16,6 +16,7 @@ import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.util.Helper;
 
@@ -63,11 +64,20 @@ public class DownloadManagerService extends IntentService {
         Content content = null;
         if(id==0){
             content = db.selectContentByStatus(Status.DOWNLOADING);
-            content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
         }else{
             content = db.selectContentById(id);
-            content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
         }
+        content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
+        {
+            content.setLanguage(db.selectAttributeByContentId(content.getId(), AttributeType.LANGUAGE));
+            content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
+            content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
+            content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
+            content.setUser(db.selectAttributeByContentId(content.getId(), AttributeType.UPLOADER));
+            content.setTranslators(db.selectAttributesByContentId(content.getId(), AttributeType.TRANSLATOR));
+            content.setPublishers(db.selectAttributesByContentId(content.getId(), AttributeType.PUBLISHER));
+        }
+
         if(content==null||content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR)
             return;
 
@@ -75,7 +85,7 @@ public class DownloadManagerService extends IntentService {
 
         boolean error = false;
         //Directory
-        File dir = Helper.getDir(content.getFakkuId(), DownloadManagerService.this);
+        File dir = Helper.getDownloadDir(content.getFakkuId(), DownloadManagerService.this);
 
         try {
             //Download Cover Image
@@ -111,18 +121,18 @@ public class DownloadManagerService extends IntentService {
             db.updateImageFileStatus(imageFile);
         }
         db.updateContentStatus(content);
+        content.setDownloadDate(new Date().getTime());
+        if (error) {
+            content.setStatus(Status.ERROR);
+        } else {
+            content.setStatus(Status.DOWNLOADED);
+        }
         //Save JSON file
         try {
             Helper.saveJson(content, dir);
         } catch (IOException e) {
             Log.e(TAG, "Error Save JSON " + content.getTitle(), e);
             error = true;
-        }
-        content.setDownloadDate(new Date().getTime());
-        if (error) {
-            content.setStatus(Status.ERROR);
-        } else {
-            content.setStatus(Status.DOWNLOADED);
         }
         db.updateContentStatus(content);
         Log.i(TAG, "Finish Download Content : " + content.getTitle());

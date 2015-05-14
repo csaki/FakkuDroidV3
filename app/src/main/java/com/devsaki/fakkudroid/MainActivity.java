@@ -190,7 +190,7 @@ public class MainActivity extends ActionBarActivity {
                 return;
             }
             Content contentbd = db.selectContentById(content.getUrl().hashCode());
-            if (contentbd == null) {
+            if (contentbd == null || contentbd.getStatus()==Status.MIGRATED) {
                 contentbd = content;
                 Log.i(TAG, "Saving content : " + content.getUrl());
                 try {

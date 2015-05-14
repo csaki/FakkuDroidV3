@@ -81,7 +81,8 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 statement.bindString(indexColumn++, row.getCoverImageUrl());
                 statement.execute();
 
-                insertImageFiles(db, row);
+                if(row.getImageFiles()!=null)
+                    insertImageFiles(db, row);
 
                 List<Attribute> attributes = new ArrayList<>();
                 if (row.getSerie() != null)
@@ -209,7 +210,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         try {
             query = "%" + query + "%";
             db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", query, query, AttributeType.ARTIST + "", AttributeType.TAG + "", AttributeType.SERIE + ""});
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST + "", AttributeType.TAG + "", AttributeType.SERIE + ""});
 
             if (cursor.moveToFirst()) {
                 result = new ArrayList<>();

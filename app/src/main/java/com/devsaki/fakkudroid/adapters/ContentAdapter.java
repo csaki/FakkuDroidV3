@@ -58,32 +58,37 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         TextView tvTags = (TextView) rowView.findViewById(R.id.tvTags);
 
         tvTitle.setText(content.getTitle());
-        tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", content.getSerie().getName())));
+        if (content.getSerie() != null)
+            tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", content.getSerie().getName())));
+        else
+            tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", "")));
 
         String artists = "";
-        for(int i = 0; i < content.getArtists().size(); i++){
-            Attribute attribute = content.getArtists().get(i);
-            artists += attribute.getName();
-            if(i!=content.getArtists().size()-1){
-                artists += ", ";
+        if (content.getArtists() != null)
+            for (int i = 0; i < content.getArtists().size(); i++) {
+                Attribute attribute = content.getArtists().get(i);
+                artists += attribute.getName();
+                if (i != content.getArtists().size() - 1) {
+                    artists += ", ";
+                }
             }
-        }
         tvArtist.setText(Html.fromHtml(templateTvArtist.replace("@artist@", artists)));
 
         String tags = "";
-        for(int i = 0; i < content.getTags().size(); i++){
-            Attribute attribute = content.getTags().get(i);
-            tags += templateTvTags.replace("@tag@", attribute.getName());
-            if(i!=content.getArtists().size()-1){
-                tags += ", ";
+        if (content.getTags() != null)
+            for (int i = 0; i < content.getTags().size(); i++) {
+                Attribute attribute = content.getTags().get(i);
+                tags += templateTvTags.replace("@tag@", attribute.getName());
+                if (i != content.getArtists().size() - 1) {
+                    tags += ", ";
+                }
             }
-        }
         tvTags.setText(Html.fromHtml(tags));
 
-        final File dir = Helper.getDir(content.getFakkuId(), getContext());
+        final File dir = Helper.getDownloadDir(content.getFakkuId(), getContext());
         File coverFile = new File(dir, "thumb.jpg");
 
-        if(coverFile.exists()){
+        if (coverFile.exists()) {
             Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
                     coverFile.getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
                     ImageQuality.MEDIUM.getHeight());
@@ -114,20 +119,21 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         return rowView;
     }
 
-    private void readContent(Content content, File dir){
-        for(ImageFile imageFile : content.getImageFiles()){
+    private void readContent(Content content, File dir) {
+        for (ImageFile imageFile : content.getImageFiles()) {
             File file = new File(dir, imageFile.getName());
-            if(file.exists()){
+            if (file.exists()) {
                 Helper.openFile(file, getContext());
                 return;
             }
         }
     }
 
-    private void deleteContent(Content content){
+    private void deleteContent(Content content) {
         Toast.makeText(getContext(), "Test click delete : " + content.getTitle(), Toast.LENGTH_SHORT).show();
     }
-    private void viewContent(Content content){
+
+    private void viewContent(Content content) {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.putExtra(MainActivity.INTENT_URL, Constants.FAKKU_URL + content.getUrl());
 
