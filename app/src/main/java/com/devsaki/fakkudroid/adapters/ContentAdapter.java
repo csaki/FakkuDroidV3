@@ -120,13 +120,16 @@ public class ContentAdapter extends ArrayAdapter<Content> {
     }
 
     private void readContent(Content content, File dir) {
-        for (ImageFile imageFile : content.getImageFiles()) {
-            File file = new File(dir, imageFile.getName());
-            if (file.exists()) {
-                Helper.openFile(file, getContext());
-                return;
+        if (content.getImageFiles() != null)
+            for (ImageFile imageFile : content.getImageFiles()) {
+                File file = new File(dir, imageFile.getName());
+                if (file.exists()) {
+                    Helper.openFile(file, getContext());
+                    return;
+                }
             }
-        }
+        else
+            Helper.openFile(new File(dir, "001.jpg"), getContext());
     }
 
     private void deleteContent(Content content) {
