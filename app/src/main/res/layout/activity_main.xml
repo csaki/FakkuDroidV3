@@ -6,6 +6,18 @@
     tools:context=".MainActivity">
 
 
+    <ProgressBar
+        android:id="@+id/pbMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal" />
+    <WebView
+        android:id="@+id/wbMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/pbMain"
+        ></WebView>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fabDownload"
@@ -45,16 +57,4 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="5dp"/>
-    <ProgressBar
-        android:id="@+id/pbMain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal" />
-    <WebView
-        android:id="@+id/wbMain"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/pbMain"
-        ></WebView>
 </RelativeLayout>

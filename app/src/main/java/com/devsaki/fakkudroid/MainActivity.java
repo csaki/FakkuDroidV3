@@ -28,6 +28,8 @@ import com.devsaki.fakkudroid.util.Constants;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -175,8 +177,22 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            if (url.startsWith("https://www.fakku.net/manga/") || url.startsWith("https://www.fakku.net/doujinshi/")) {
-                view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
+            URI uri = null;
+            try {
+                uri = new URI(url);
+            } catch (URISyntaxException e) {
+                Log.e(TAG, "Error reading current url form webview", e);
+            }
+
+            if (uri!=null) {
+                String[] paths = uri.getPath().split("/");
+                if(paths.length>=3){
+                    if(paths[1].equals("doujinshi")||paths[1].equals("manga")){
+                        if(paths.length==3||!paths[3].equals("read")){
+                            view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
+                        }
+                    }
+                }
             }
         }
     }
@@ -190,33 +206,26 @@ public class MainActivity extends ActionBarActivity {
                 return;
             }
             Content contentbd = db.selectContentById(content.getUrl().hashCode());
-            if (contentbd == null || contentbd.getStatus()==Status.MIGRATED) {
-                contentbd = content;
+            if (contentbd == null) {
                 Log.i(TAG, "Saving content : " + content.getUrl());
                 try {
-                    content.setImageFiles(new ArrayList<ImageFile>(content.getQtyPages()));
-                    String urlCdn = "http://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/")) + "/images/";
                     content.setCoverImageUrl("http://" + content.getCoverImageUrl().substring(2));
-                    for (int i = 1; i <= content.getQtyPages(); i++) {
-                        String name = String.format("%03d", i) + ".jpg";
-                        ImageFile imageFile = new ImageFile();
-                        imageFile.setUrl(urlCdn + name);
-                        imageFile.setOrder(i);
-                        imageFile.setStatus(Status.SAVED);
-                        imageFile.setName(name);
-                        content.getImageFiles().add(imageFile);
-                    }
-
                     db.insertContent(content);
                 } catch (Exception e) {
                     Log.e(TAG, "Saving content", e);
                     return;
                 }
+            }else if(contentbd.getStatus()==Status.MIGRATED){
+                content.setStatus(Status.DOWNLOADED);
+                db.insertContent(content);
             }
             if (content.isDownloadable()) {
-                currentContent = contentbd;
+                currentContent = content;
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.show();
+            }else {
+                FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+                fabDownload.hide();
             }
         }
     }

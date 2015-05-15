@@ -103,7 +103,7 @@ public class ImporterActivity extends ActionBarActivity {
                 contents = new ArrayList<>();
                 for(File file : files){
                     processeds++;
-                    currentPercent = processeds/files.length*100;
+                    currentPercent = (int) (processeds*100.0/files.length);
                     if(file.isDirectory()){
                         publishProgress(file.getName());
                         File json = new File(file, Constants.JSON_FILE_NAME);

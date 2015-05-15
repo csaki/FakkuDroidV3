@@ -8,6 +8,24 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.devsaki.fakkudroid.ContentListActivity">
 
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fabRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:src="@drawable/ic_action_refresh"
+        fab:fab_colorNormal="@color/primary"
+        fab:fab_colorPressed="@color/primary_dark"
+        fab:fab_colorRipple="@color/ripple"
+        android:layout_above="@+id/fabBrowser"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"/>
+
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fabBrowser"
         android:layout_width="wrap_content"
@@ -33,10 +51,5 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="5dp"/>
-
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
 
 </RelativeLayout>

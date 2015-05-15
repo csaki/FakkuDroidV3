@@ -1,5 +1,7 @@
 package com.devsaki.fakkudroid.parser;
 
+import android.util.Log;
+
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
@@ -20,6 +22,8 @@ import java.util.Locale;
  * Created by DevSaki on 09/05/2015.
  */
 public class FakkuParser {
+
+    private final static String TAG = FakkuParser.class.getName();
 
     public static List<Content> parseListContents(String html){
         Document doc = Jsoup.parse(html);
@@ -71,7 +75,7 @@ public class FakkuParser {
             result.setQtyPages(Integer.parseInt(rows.get(rowIndex++).select(".right").html().replace(" pages", "")));
             //Favorites
             if(rows.get(rowIndex).select("div.left").html().equals("Favorites")){
-                result.setQtyFavorites(Integer.parseInt(rows.get(rowIndex++).select(".right").html().replace(" favorites", "")));
+                result.setQtyFavorites(Integer.parseInt(rows.get(rowIndex++).select(".right").html().replace(" favorites", "").replace(",", "")));
             }
             //Uploader
             Element uploader = rows.get(rowIndex++).select(".right").first();
@@ -85,12 +89,13 @@ public class FakkuParser {
                 result.getUser().setType(AttributeType.UPLOADER);
             }
             String date = uploader.html().substring(uploader.html().lastIndexOf(" on ") + 4).trim();
+            date = date.replace("st,",",").replace("nd,", ",").replace("rd,",",").replace("th,",",");
 
             SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
             try {
                 result.setUploadDate(sdf.parse(date).getTime());
             } catch (ParseException e) {
-
+                Log.e(TAG, "Parsing data error : " + date, e);
             }
 
             //Description
