@@ -204,6 +204,39 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
+    public List<Content> selectContentInDownloadManager() {
+        List<Content> result = null;
+        SQLiteDatabase db = null;
+        try {
+
+            db = this.getWritableDatabase();
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_IN_DOWNLOAD_MANAGER, new String[]{Status.DOWNLOADING.getCode() + "", Status.PAUSED.getCode() + ""});
+
+            if (cursor.moveToFirst()) {
+                result = new ArrayList<>();
+                do {
+                    int indexColumn = 3;
+                    Content content = new Content();
+                    content.setUrl(cursor.getString(indexColumn++));
+                    content.setTitle(cursor.getString(indexColumn++));
+                    content.setHtmlDescription(cursor.getString(indexColumn++));
+                    content.setQtyPages(cursor.getInt(indexColumn++));
+                    content.setUploadDate(cursor.getLong(indexColumn++));
+                    content.setDownloadDate(cursor.getLong(indexColumn++));
+                    content.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                    content.setCoverImageUrl(cursor.getString(indexColumn++));
+
+                    result.add(content);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+
+        return result;
+    }
+
     public List<Content> selectContentByQuery(String query) {
         List<Content> result = null;
         SQLiteDatabase db = null;
@@ -357,6 +390,25 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             statement.bindLong(indexColumn++, row.getDownloadDate());
             statement.bindLong(indexColumn++, row.getStatus().getCode());
             statement.bindLong(indexColumn++, row.getId());
+            statement.execute();
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+    }
+
+    public void updateContentStatus(Status updateTo, Status updateFrom) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_STATUS_STATEMENT);
+            db.beginTransaction();
+            int indexColumn = 1;
+            statement.clearBindings();
+            statement.bindLong(indexColumn++, updateTo.getCode());
+            statement.bindLong(indexColumn++, updateFrom.getCode());
             statement.execute();
             db.setTransactionSuccessful();
             db.endTransaction();

@@ -32,7 +32,8 @@
 
         <activity
             android:name=".DownloadManagerActivity"
-            android:label="@string/title_activity_download_manager" >
+            android:label="@string/title_activity_download_manager"
+            android:launchMode="singleInstance" >
         </activity>
         <activity
             android:name=".FirstUseActivity"

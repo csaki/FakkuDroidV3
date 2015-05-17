@@ -1,23 +1,93 @@
 package com.devsaki.fakkudroid;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.HeaderViewListAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
+import com.devsaki.fakkudroid.adapters.ContentDownloadManagerAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
+import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.database.enums.AttributeType;
+import com.devsaki.fakkudroid.database.enums.Status;
+import com.devsaki.fakkudroid.service.DownloadManagerService;
+import com.melnykov.fab.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DownloadManagerActivity extends ActionBarActivity {
 
     private static final String TAG = DownloadManagerActivity.class.getName();
     private FakkuDroidDB db;
+    private List<Content> contents;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                double percent = bundle.getDouble(DownloadManagerService.INTENT_PERCENT_BROADCAST);
+                if(percent>=0){
+                    updatePercent(percent);
+                }else{
+                    update();
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manager);
         db = new FakkuDroidDB(this);
+        FloatingActionButton fabDownloads = (FloatingActionButton) findViewById(R.id.fabDownloads);
+        fabDownloads.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainActivity = new Intent(DownloadManagerActivity.this, ContentListActivity.class);
+                startActivity(mainActivity);
+            }
+        });
+        FloatingActionButton fabBrowser = (FloatingActionButton) findViewById(R.id.fabBrowser);
+        fabBrowser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DownloadManagerActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        FloatingActionButton fabStart = (FloatingActionButton) findViewById(R.id.fabStart);
+        fabStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.updateContentStatus(Status.DOWNLOADING, Status.PAUSED);
+                update();
+                Intent intent = new Intent(Intent.ACTION_SYNC, null, DownloadManagerActivity.this, DownloadManagerService.class);
+                startService(intent);
+            }
+        });
+        FloatingActionButton fabPause = (FloatingActionButton) findViewById(R.id.fabPause);
+        fabPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.updateContentStatus(Status.PAUSED, Status.DOWNLOADING);
+                DownloadManagerService.paused = true;
+                update();
+            }
+        });
+        update();
     }
 
     @Override
@@ -25,6 +95,18 @@ public class DownloadManagerActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_download_manager, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(DownloadManagerService.NOTIFICATION));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -40,5 +122,77 @@ public class DownloadManagerActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void resume(Content content){
+        content.setStatus(Status.DOWNLOADING);
+        db.updateContentStatus(content);
+        update();
+        if(content.getId()==contents.get(0).getId()){
+            DownloadManagerService.paused = true;
+        }
+    }
+
+    public void pause(Content content){
+        content.setStatus(Status.PAUSED);
+        db.updateContentStatus(content);
+        update();
+        if(content.getId()==contents.get(0).getId()){
+            DownloadManagerService.paused = true;
+        }
+    }
+
+    public void cancel(Content content){
+        content.setStatus(Status.SAVED);
+        db.updateContentStatus(content);
+        if(content.getId()==contents.get(0).getId()){
+            DownloadManagerService.paused = true;
+        }
+        contents.remove(content);
+    }
+
+    public void updatePercent(double percent){
+        if(contents!=null&&!contents.isEmpty()){
+            contents.get(0).setPercent(percent);
+            ((ArrayAdapter<Content>)getListAdapter()).notifyDataSetChanged();
+        }
+    }
+
+    public void update(){
+        contents = (List<Content>) db.selectContentInDownloadManager();
+        if (contents != null) {
+            for (Content content : contents) {
+                content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
+                content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
+                content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
+                content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
+            }
+        }else{
+            contents = new ArrayList<>();
+        }
+        ContentDownloadManagerAdapter adapter = new ContentDownloadManagerAdapter(this, contents);
+        setListAdapter(adapter);
+    }
+
+    private ListView mListView;
+
+    private ListView getListView() {
+        if (mListView == null) {
+            mListView = (ListView) findViewById(R.id.list);
+        }
+        return mListView;
+    }
+
+    private void setListAdapter(ListAdapter adapter) {
+        getListView().setAdapter(adapter);
+    }
+
+    private ListAdapter getListAdapter() {
+        ListAdapter adapter = getListView().getAdapter();
+        if (adapter instanceof HeaderViewListAdapter) {
+            return ((HeaderViewListAdapter) adapter).getWrappedAdapter();
+        } else {
+            return adapter;
+        }
     }
 }

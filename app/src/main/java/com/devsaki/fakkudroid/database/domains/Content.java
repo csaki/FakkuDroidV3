@@ -11,28 +11,46 @@ import java.util.List;
  */
 public class Content extends ContentTable{
 
+    @Expose
     private String url;
+    @Expose
     private String title;
+    @Expose
     private String htmlDescription;
+    @Expose
     private Attribute serie;
+    @Expose
     private List<Attribute> artists;
+    @Expose
     private List<Attribute> publishers;
+    @Expose
     private Attribute language;
+    @Expose
     private List<Attribute> tags;
+    @Expose
     private List<Attribute> translators;
+    @Expose
     private String coverImageUrl;
     @Expose(serialize = false, deserialize = false)
     private String sampleImageUrl;
+    @Expose
     private Integer qtyPages;
     @Expose(serialize = false, deserialize = false)
     private Integer qtyFavorites;
+    @Expose
     private long uploadDate;
+    @Expose
     private Attribute user;
+    @Expose
     private long downloadDate;
+    @Expose
     private Status status;
+    @Expose
     private List<ImageFile> imageFiles;
     @Expose(serialize = false, deserialize = false)
-    private boolean isDownloadable;
+    private boolean downloadable;
+    @Expose(serialize = false, deserialize = false)
+    private double percent;
 
     public Integer getId() {
         return url.hashCode();
@@ -191,11 +209,19 @@ public class Content extends ContentTable{
     }
 
     public boolean isDownloadable() {
-        return isDownloadable;
+        return downloadable;
     }
 
-    public void setDownloadable(boolean isDownloadable) {
-        this.isDownloadable = isDownloadable;
+    public void setDownloadable(boolean downloadable) {
+        this.downloadable = downloadable;
+    }
+
+    public double getPercent() {
+        return percent;
+    }
+
+    public void setPercent(double percent) {
+        this.percent = percent;
     }
 
     @Override

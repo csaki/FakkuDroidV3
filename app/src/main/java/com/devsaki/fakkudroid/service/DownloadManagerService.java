@@ -16,24 +16,19 @@ import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
-import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
-import com.devsaki.fakkudroid.exceptions.HttpClientException;
 import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.Helper;
 import com.devsaki.fakkudroid.util.HttpClientHelper;
 
 import net.fakku.api.FakkuClient;
 import net.fakku.api.dto.conteiners.ContentConteinerDto;
-import net.fakku.api.dto.single.ContentDto;
-import net.fakku.api.dto.single.ImagesDto;
 import net.fakku.api.dto.single.PageDto;
-import net.fakku.api.exceptions.FakkuApiException;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,10 +37,13 @@ public class DownloadManagerService extends IntentService {
 
     private static final String TAG = DownloadManagerService.class.getName();
     private static boolean started = false;
+    public static final String INTENT_PERCENT_BROADCAST = "broadcast_percent";
+    public static final String NOTIFICATION = "com.devsaki.fakkudroid.service";
 
     private NotificationManager notificationManager;
     private NotificationCompat.Builder mBuilder;
     private FakkuDroidDB db;
+    public static boolean paused;
 
     @Override
     public void onCreate() {
@@ -74,14 +72,16 @@ public class DownloadManagerService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        int id = intent.getIntExtra("content_id", 0);
-        Content content = null;
-        if(id==0){
-            content = db.selectContentByStatus(Status.DOWNLOADING);
-        }else{
-            content = db.selectContentById(id);
-        }
+        Content content = db.selectContentByStatus(Status.DOWNLOADING);
+        if(content==null||content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR)
+            return;
+
         content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
+
+        if(paused){
+            paused = false;
+            return;
+        }
 
         if(content.getImageFiles()==null||content.getImageFiles().size()!=content.getQtyPages()){
             content.setImageFiles(new ArrayList<ImageFile>());
@@ -98,9 +98,9 @@ public class DownloadManagerService extends IntentService {
                     content.getImageFiles().add(imageFile);
                 }
             }catch (Exception ex){
-                URL url = null;
+                Log.e(TAG, "Error loading images form api", ex);
                 try {
-                    url = new URL(Constants.FAKKU_URL + content.getUrl() + Constants.FAKKU_READ);
+                    URL url = new URL(Constants.FAKKU_URL + content.getUrl() + Constants.FAKKU_READ);
                     String site = null;
                     String extention = null;
                     String html = HttpClientHelper.call(url);
@@ -115,9 +115,9 @@ public class DownloadManagerService extends IntentService {
                     if(site.startsWith("//")){
                         site = "https:" + site;
                     }
-                    int indexStartExtention = html.indexOf(find, indexFinishSite + find.length()) + find.length();
-                    int indexFinishExtention = html.indexOf(find, indexStartExtention);
-                    extention = html.substring(indexStartExtention, indexFinishExtention);
+                    int indexStartExtension = html.indexOf(find, indexFinishSite + find.length()) + find.length();
+                    int indexFinishExtension = html.indexOf(find, indexStartExtension);
+                    extention = html.substring(indexStartExtension, indexFinishExtension);
                     for (int i = 1; i <= content.getQtyPages(); i++) {
                         String name = String.format("%03d", i) + extention;
                         ImageFile imageFile = new ImageFile();
@@ -129,7 +129,7 @@ public class DownloadManagerService extends IntentService {
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "Guessing extention");
+                    Log.e(TAG, "Guessing extension");
                     String urlCdn = "https://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/")) + "/images/";
                     for (int i = 1; i <= content.getQtyPages(); i++) {
                         String name = String.format("%03d", i) + ".jpg";
@@ -145,8 +145,12 @@ public class DownloadManagerService extends IntentService {
             db.insertContent(content);
         }
 
-        if(content==null||content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR)
+        if(paused){
+            paused = false;
+            content = db.selectContentById(content.getId());
+            showNotification(0, content);
             return;
+        }
 
         Log.i(TAG, "Start Download Content : " + content.getTitle());
 
@@ -168,6 +172,19 @@ public class DownloadManagerService extends IntentService {
         showNotification(0, content);
         int count = 0;
         for (ImageFile imageFile : content.getImageFiles()) {
+            if(paused){
+                paused = false;
+                content = db.selectContentById(content.getId());
+                showNotification(0, content);
+                if(content.getStatus()==Status.SAVED){
+                    try {
+                        FileUtils.deleteDirectory(dir);
+                    } catch (IOException e) {
+                        Log.e(TAG, "error deleting content directory", e);
+                    }
+                }
+                return;
+            }
             boolean imageFileErrorDownload = false;
             try {
                 if (imageFile.getStatus() != Status.IGNORED) {
@@ -175,10 +192,13 @@ public class DownloadManagerService extends IntentService {
                     Log.i(TAG, "Download Image File (" + imageFile.getName() + ") / " + content.getTitle());
                 }
                 count++;
-                showNotification(count*100.0/content.getImageFiles().size(), content);
+                double percent = count*100.0/content.getImageFiles().size();
+                showNotification(percent, content);
+                updateActivity(percent);
             } catch (Exception ex) {
                 Log.e(TAG, "Error Saving Image File (" + imageFile.getName() + ") " + content.getTitle(), ex);
                 error = true;
+                imageFileErrorDownload=true;
             }
             if (imageFileErrorDownload) {
                 imageFile.setStatus(Status.ERROR);
@@ -199,17 +219,23 @@ public class DownloadManagerService extends IntentService {
             Helper.saveJson(content, dir);
         } catch (IOException e) {
             Log.e(TAG, "Error Save JSON " + content.getTitle(), e);
-            error = true;
         }
         db.updateContentStatus(content);
         Log.i(TAG, "Finish Download Content : " + content.getTitle());
         showNotification(0, content);
+        updateActivity(-1);
         content = db.selectContentByStatus(Status.DOWNLOADING);
         if(content!=null){
             Intent intentService = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
             intentService.putExtra("content_id", content.getId());
             startService(intentService);
         }
+    }
+
+    private void updateActivity(double percent){
+        Intent intent = new Intent(NOTIFICATION);
+        intent.putExtra(INTENT_PERCENT_BROADCAST, percent);
+        sendBroadcast(intent);
     }
 
     private void showNotification(double percent, Content content) {

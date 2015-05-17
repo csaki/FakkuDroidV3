@@ -31,6 +31,8 @@ public abstract class ContentTable {
     public static final String INSERT_STATEMENT = "INSERT OR REPLACE INTO " + TABLE_NAME + " VALUES (?,?,?,?,?,?,?,?,?,?,?);";
     public static final String UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT = "UPDATE " + TABLE_NAME + " SET " + DOWNLOAD_DATE_COLUMN + " = ?, " + STATUS_COLUMN
             + " = ? WHERE " + ID_COLUMN + " = ?";
+    public static final String UPDATE_CONTENT_STATUS_STATEMENT = "UPDATE " + TABLE_NAME + " SET " + STATUS_COLUMN
+            + " = ? WHERE " + STATUS_COLUMN + " = ?";
 
     public static final String DELETE_STATEMENT = "DELETE FROM " + TABLE_NAME + " WHERE " + ID_COLUMN + " = ?";
 
@@ -42,6 +44,11 @@ public abstract class ContentTable {
             + URL_COLUMN + ", " + TITLE_COLUMN + ", " + HTML_DESCRIPTION_COLUMN + ", " + QTY_PAGES_COLUMN + ", "
             + UPLOAD_DATE_COLUMN + ", " + DOWNLOAD_DATE_COLUMN + ", " + STATUS_COLUMN  + ", " + COVER_IMAGE_URL_COLUMN
             + " FROM " + TABLE_NAME + " C WHERE C." + STATUS_COLUMN + " = ? ORDER BY C." + DOWNLOAD_DATE_COLUMN;
+
+    public static final String SELECT_IN_DOWNLOAD_MANAGER = "SELECT " + ID_COLUMN + ", " + FAKKU_ID_COLUMN + ", " + CATEGORY_COLUMN + ", "
+            + URL_COLUMN + ", " + TITLE_COLUMN + ", " + HTML_DESCRIPTION_COLUMN + ", " + QTY_PAGES_COLUMN + ", "
+            + UPLOAD_DATE_COLUMN + ", " + DOWNLOAD_DATE_COLUMN + ", " + STATUS_COLUMN  + ", " + COVER_IMAGE_URL_COLUMN
+            + " FROM " + TABLE_NAME + " C WHERE C." + STATUS_COLUMN + " in (?, ?) ORDER BY C." + STATUS_COLUMN + ", C." + DOWNLOAD_DATE_COLUMN;
 
     public static final String SELECT_DOWNLOADS = "SELECT C." + ID_COLUMN + ", C." + FAKKU_ID_COLUMN + ", C." + CATEGORY_COLUMN + ", C."
             + URL_COLUMN + ", C." + TITLE_COLUMN + ", C." + HTML_DESCRIPTION_COLUMN + ", C." + QTY_PAGES_COLUMN + ", C."

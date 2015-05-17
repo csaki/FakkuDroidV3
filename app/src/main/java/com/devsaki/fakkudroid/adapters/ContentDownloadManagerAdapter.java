@@ -1,13 +1,9 @@
 package com.devsaki.fakkudroid.adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.text.Html;
-import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,36 +11,32 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.devsaki.fakkudroid.MainActivity;
+import com.devsaki.fakkudroid.DownloadManagerActivity;
 import com.devsaki.fakkudroid.R;
-import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
-import com.devsaki.fakkudroid.database.domains.ImageFile;
-import com.devsaki.fakkudroid.util.Constants;
+import com.devsaki.fakkudroid.database.enums.Status;
+import com.devsaki.fakkudroid.service.DownloadManagerService;
 import com.devsaki.fakkudroid.util.Helper;
 import com.devsaki.fakkudroid.util.ImageQuality;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
  * Created by neko on 11/05/2015.
  */
-public class ContentAdapter extends ArrayAdapter<Content> {
+public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
 
-    private final static String TAG = ContentAdapter.class.getName();
+    private final static String TAG = ContentDownloadManagerAdapter.class.getName();
     private final Context context;
     private final List<Content> contents;
     private LruCache<String, Bitmap> mMemoryCache;
 
-    public ContentAdapter(Context context, List<Content> contents) {
+    public ContentDownloadManagerAdapter(Context context, List<Content> contents) {
         super(context, R.layout.row_download, contents);
         this.context = context;
         this.contents = contents;
@@ -100,7 +92,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         // Decode image in background.
         @Override
         protected Bitmap doInBackground(File... params) {
-            if(params[0].exists()){
+            if(params[0].exists()&&params[0].getAbsolutePath()!=null){
                 Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
                         params[0].getAbsolutePath(), ImageQuality.LOW.getWidth(),
                         ImageQuality.LOW.getHeight());
@@ -124,7 +116,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.row_download, parent, false);
+        View rowView = inflater.inflate(R.layout.row_download_manager, parent, false);
 
         final Content content = contents.get(position);
 
@@ -171,73 +163,46 @@ public class ContentAdapter extends ArrayAdapter<Content> {
 
         loadBitmap(coverFile, ivCover);
 
-        Button btnRead = (Button) rowView.findViewById(R.id.btnRead);
-        btnRead.setOnClickListener(new View.OnClickListener() {
+        Button btnCancel = (Button) rowView.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                readContent(content, dir);
+                ((DownloadManagerActivity) getContext()).cancel(content);
+                notifyDataSetChanged();
             }
         });
-        Button btnDelete = (Button) rowView.findViewById(R.id.btnDelete);
-        btnDelete.setOnClickListener(new View.OnClickListener() {
+        Button btnPause = (Button) rowView.findViewById(R.id.btnPause);
+        btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteContent(content, dir);
-            }
-        });
-        Button btnView = (Button) rowView.findViewById(R.id.btnViewBrowser);
-        btnView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewContent(content);
-            }
-        });
-        return rowView;
-    }
-
-    private void readContent(Content content, File dir) {
-        if (content.getImageFiles() != null)
-            for (ImageFile imageFile : content.getImageFiles()) {
-                File file = new File(dir, imageFile.getName());
-                if (file.exists()) {
-                    Helper.openFile(file, getContext());
-                    return;
+                if(content.getStatus()!=Status.DOWNLOADING){
+                    ((DownloadManagerActivity)getContext()).resume(content);
+                }else {
+                    ((DownloadManagerActivity)getContext()).pause(content);
+                    notifyDataSetChanged();
                 }
             }
-        else
-            Helper.openFile(new File(dir, "001.jpg"), getContext());
-    }
+        });
+        if(content.getStatus()!=Status.DOWNLOADING){
+            btnPause.setText(R.string.resume);
+        }
 
-    private void deleteContent(final Content content, final File dir) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-        builder.setMessage(R.string.ask_delete)
-                .setPositiveButton(android.R.string.yes,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                FakkuDroidDB db = new FakkuDroidDB(getContext());
+        ProgressBar pb = (ProgressBar) rowView.findViewById(R.id.pbDownload);
+        if(DownloadManagerService.isStarted()){
+            if(content.getStatus() == Status.PAUSED){
+                pb.setVisibility(View.INVISIBLE);
+            }else if(content.getPercent()>0){
+                pb.setVisibility(View.VISIBLE);
+                pb.setIndeterminate(false);
+                pb.setProgress((int)content.getPercent());
+            }else{
+                pb.setVisibility(View.VISIBLE);
+                pb.setIndeterminate(true);
+            }
+        }else{
+            pb.setVisibility(View.INVISIBLE);
+        }
 
-                                try {
-                                    FileUtils.deleteDirectory(dir);
-                                } catch (IOException e) {
-                                    Log.e(TAG, "error deleting content directory", e);
-                                }
-
-                                db.deleteContent(content);
-
-                                Toast.makeText(getContext(),
-                                        getContext().getResources().getString(R.string.deleted)
-                                                .replace("@content", content.getTitle()),
-                                        Toast.LENGTH_SHORT).show();
-                                contents.remove(content);
-                                notifyDataSetChanged();
-                            }
-                        }).setNegativeButton(android.R.string.no, null).create().show();
-    }
-
-    private void viewContent(Content content) {
-        Intent intent = new Intent(getContext(), MainActivity.class);
-        intent.putExtra(MainActivity.INTENT_URL, Constants.FAKKU_URL + content.getUrl());
-
-        getContext().startActivity(intent);
+        return rowView;
     }
 }

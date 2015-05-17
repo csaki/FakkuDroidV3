@@ -21,6 +21,7 @@ import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.melnykov.fab.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -41,8 +42,8 @@ public class ContentListActivity extends ActionBarActivity {
         fabBrowser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainActivity = new Intent(ContentListActivity.this, MainActivity.class);
-                startActivity(mainActivity);
+                Intent intent = new Intent(ContentListActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
         FloatingActionButton fabRefresh = (FloatingActionButton) findViewById(R.id.fabRefresh);
@@ -50,6 +51,14 @@ public class ContentListActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 searchContent();
+            }
+        });
+        FloatingActionButton fabDownloadManager = (FloatingActionButton) findViewById(R.id.fabDownloadManager);
+        fabDownloadManager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ContentListActivity.this, DownloadManagerActivity.class);
+                startActivity(intent);
             }
         });
         searchContent();
@@ -64,9 +73,11 @@ public class ContentListActivity extends ActionBarActivity {
                 content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
                 content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
             }
-            ContentAdapter adapter = new ContentAdapter(this, contents);
-            setListAdapter(adapter);
+        }else{
+            contents = new ArrayList<>();
         }
+        ContentAdapter adapter = new ContentAdapter(this, contents);
+        setListAdapter(adapter);
     }
 
     @Override
@@ -98,18 +109,6 @@ public class ContentListActivity extends ActionBarActivity {
             }
         });
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private ListView mListView;

@@ -3,6 +3,13 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="5dp">
+    <ProgressBar
+        android:id="@+id/pbDownload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:indeterminate="true"
+        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,24 +66,17 @@
         android:layout_gravity="center_horizontal">
         
         <Button
-            android:id="@+id/btnViewBrowser"
+            android:id="@+id/btnPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/view_browser"
+            android:text="@string/pause"
             android:layout_weight="3"/>
 
         <Button
-            android:id="@+id/btnDelete"
+            android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/delete"
-            android:layout_weight="3"/>
-
-        <Button
-            android:id="@+id/btnRead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/read"
+            android:text="@string/cancel"
             android:layout_weight="3"/>
         </LinearLayout>
 </LinearLayout>
