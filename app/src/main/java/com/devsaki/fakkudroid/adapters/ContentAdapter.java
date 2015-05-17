@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,11 +42,75 @@ public class ContentAdapter extends ArrayAdapter<Content> {
     private final static String TAG = ContentAdapter.class.getName();
     private final Context context;
     private final List<Content> contents;
+    private LruCache<String, Bitmap> mMemoryCache;
 
     public ContentAdapter(Context context, List<Content> contents) {
         super(context, R.layout.row_download, contents);
         this.context = context;
         this.contents = contents;
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    public void loadBitmap(File file, ImageView mImageView) {
+        final String imageKey = file.getAbsolutePath();
+
+        final Bitmap bitmap = getBitmapFromMemCache(imageKey);
+        if (bitmap != null) {
+            mImageView.setImageBitmap(bitmap);
+        } else {
+            mImageView.setImageResource(R.drawable.ic_launcher);
+            BitmapWorkerTask task = new BitmapWorkerTask(mImageView);
+            task.execute(file);
+        }
+    }
+
+    class BitmapWorkerTask extends AsyncTask<File, Void, Bitmap> {
+
+        private ImageView imageView;
+
+        public BitmapWorkerTask(ImageView imageView) {
+            this.imageView = imageView;
+        }
+
+        // Decode image in background.
+        @Override
+        protected Bitmap doInBackground(File... params) {
+            Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
+                    params[0].getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
+                    ImageQuality.MEDIUM.getHeight());
+            addBitmapToMemoryCache(params[0].getAbsolutePath(), thumbBitmap);
+            return thumbBitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            imageView.setImageBitmap(bitmap);
+        }
     }
 
     @Override
@@ -87,7 +153,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
             for (int i = 0; i < content.getTags().size(); i++) {
                 Attribute attribute = content.getTags().get(i);
                 tags += templateTvTags.replace("@tag@", attribute.getName());
-                if (i != content.getArtists().size() - 1) {
+                if (i != content.getTags().size() - 1) {
                     tags += ", ";
                 }
             }
@@ -96,12 +162,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         final File dir = Helper.getDownloadDir(content.getFakkuId(), getContext());
         File coverFile = new File(dir, "thumb.jpg");
 
-        if (coverFile.exists()) {
-            Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
-                    coverFile.getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
-                    ImageQuality.MEDIUM.getHeight());
-            ivCover.setImageBitmap(thumbBitmap);
-        }
+        loadBitmap(coverFile, ivCover);
 
         Button btnRead = (Button) rowView.findViewById(R.id.btnRead);
         btnRead.setOnClickListener(new View.OnClickListener() {

@@ -18,8 +18,7 @@
         <ImageView
             android:id="@+id/ivCover"
             android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:src="@drawable/ic_launcher"/>
+            android:layout_height="140dp"/>
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
