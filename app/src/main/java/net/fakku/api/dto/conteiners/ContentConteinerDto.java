@@ -13,8 +13,7 @@ import java.util.List;
 public class ContentConteinerDto {
 
     private ContentDto content;
-    @Expose(serialize = false, deserialize = false)
-    private List<PageDto> pages;
+    private List<PageDto> pagesDto;
 
     public ContentDto getContent() {
         return content;
@@ -24,11 +23,11 @@ public class ContentConteinerDto {
         this.content = content;
     }
 
-    public List<PageDto> getPages() {
-        return pages;
+    public List<PageDto> getPagesDto() {
+        return pagesDto;
     }
 
-    public void setPages(List<PageDto> pages) {
-        this.pages = pages;
+    public void setPagesDto(List<PageDto> pagesDto) {
+        this.pagesDto = pagesDto;
     }
 }

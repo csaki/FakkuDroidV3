@@ -1,5 +1,7 @@
 package net.fakku.api.dto.single;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -7,23 +9,41 @@ import java.util.List;
  */
 public class ContentDto {
 
+    @SerializedName("content_name")
     private String name;
+    @SerializedName("content_url")
     private String url;
+    @SerializedName("content_description")
     private String description;
+    @SerializedName("content_language")
     private String language;
+    @SerializedName("content_category")
     private String category;
+    @SerializedName("content_date")
     private Long date;
+    @SerializedName("content_filesize")
     private Long filesize;
+    @SerializedName("content_favorites")
     private Long favorites;
+    @SerializedName("content_comments")
     private Long comments;
+    @SerializedName("content_pages")
     private Long pages;
+    @SerializedName("content_poster")
     private String poster;
+    @SerializedName("content_poster_url")
     private String posterUrl;
+    @SerializedName("content_tags")
     private List<AttributeDto> tags;
+    @SerializedName("content_translators")
     private List<AttributeDto> translators;
+    @SerializedName("content_publishers")
     private List<AttributeDto> publishers;
+    @SerializedName("content_series")
     private List<AttributeDto> series;
+    @SerializedName("content_artists")
     private List<AttributeDto> artists;
+    @SerializedName("content_images")
     private ImagesDto images;
 
     public String getName() {

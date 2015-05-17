@@ -1,12 +1,17 @@
 package net.fakku.api.dto.single;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by DevSaki on 15/05/2015.
  */
 public class AttributeDto {
 
+    @SerializedName("attribute")
     private String name;
+    @SerializedName("attribute_id")
     private String id;
+    @SerializedName("attribute_link")
     private String link;
 
     public String getName() {

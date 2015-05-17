@@ -31,9 +31,9 @@ public class FakkuClient {
             result = new Gson().fromJson(json, ContentConteinerDto.class);
             JSONObject jsonObject = new JSONObject(json);
             if(jsonObject.has("pages")){
-                result.setPages(new ArrayList<PageDto>());
+                result.setPagesDto(new ArrayList<PageDto>());
                 JSONObject pages = jsonObject.getJSONObject("pages");
-                Iterator<String> iter = jsonObject.keys();
+                Iterator<String> iter = pages.keys();
 
                 while (iter.hasNext()) {
                     String key = iter.next();
@@ -42,7 +42,7 @@ public class FakkuClient {
                     pageDto.setPage(Integer.parseInt(key));
                     pageDto.setPageContent(new PageDto.PageContent(page.getString("thumb"), page.getString("image")));
 
-                    result.getPages().add(pageDto);
+                    result.getPagesDto().add(pageDto);
                 }
             }
         } catch (HttpClientException e) {

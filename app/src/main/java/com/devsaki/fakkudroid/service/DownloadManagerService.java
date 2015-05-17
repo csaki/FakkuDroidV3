@@ -83,12 +83,12 @@ public class DownloadManagerService extends IntentService {
         }
         content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
 
-        if(content.getImageFiles()==null){
+        if(content.getImageFiles()==null||content.getImageFiles().size()!=content.getQtyPages()){
             content.setImageFiles(new ArrayList<ImageFile>());
             try {
                 ContentConteinerDto conteinerDto = FakkuClient.callContent(content.getCategory(), content.getFakkuId());
 
-                for (PageDto pageDto : conteinerDto.getPages()){
+                for (PageDto pageDto : conteinerDto.getPagesDto()){
                     ImageFile imageFile = new ImageFile();
                     imageFile.setStatus(Status.SAVED);
                     imageFile.setOrder(pageDto.getPage());
@@ -112,7 +112,10 @@ public class DownloadManagerService extends IntentService {
                     find = "'";
                     int indexFinishSite = html.indexOf(find, indexReturn);
                     site = html.substring(indexReturn, indexFinishSite);
-                    int indexStartExtention = html.indexOf(find, indexFinishSite + find.length());
+                    if(site.startsWith("//")){
+                        site = "https:" + site;
+                    }
+                    int indexStartExtention = html.indexOf(find, indexFinishSite + find.length()) + find.length();
                     int indexFinishExtention = html.indexOf(find, indexStartExtention);
                     extention = html.substring(indexStartExtention, indexFinishExtention);
                     for (int i = 1; i <= content.getQtyPages(); i++) {

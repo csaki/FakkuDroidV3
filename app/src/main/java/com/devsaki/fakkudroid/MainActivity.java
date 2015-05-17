@@ -25,8 +25,11 @@ import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.devsaki.fakkudroid.service.DownloadManagerService;
 import com.devsaki.fakkudroid.util.Constants;
+import com.devsaki.fakkudroid.util.Helper;
 import com.melnykov.fab.FloatingActionButton;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -218,6 +221,13 @@ public class MainActivity extends ActionBarActivity {
             }else if(contentbd.getStatus()==Status.MIGRATED){
                 content.setStatus(Status.DOWNLOADED);
                 db.insertContent(content);
+                //Save JSON file
+                try {
+                    File dir = Helper.getDownloadDir(content.getFakkuId(), MainActivity.this);
+                    Helper.saveJson(content, dir);
+                } catch (IOException e) {
+                    Log.e(TAG, "Error Save JSON " + content.getTitle(), e);
+                }
             }
             if (content.isDownloadable()) {
                 currentContent = content;
