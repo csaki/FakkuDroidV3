@@ -320,6 +320,32 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         }
     }
 
+    public void deleteContent(Content content) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            SQLiteStatement statement = db.compileStatement(ContentTable.DELETE_STATEMENT);
+            SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
+            SQLiteStatement statementAttributes = db.compileStatement(ContentAttributeTable.DELETE_STATEMENT);
+            db.beginTransaction();
+            int indexColumn = 1;
+            statement.clearBindings();
+            statement.bindLong(indexColumn, content.getId());
+            statement.execute();
+            statementImages.clearBindings();
+            statementImages.bindLong(indexColumn, content.getId());
+            statementImages.execute();
+            statementAttributes.clearBindings();
+            statementAttributes.bindLong(indexColumn, content.getId());
+            statementAttributes.execute();
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+    }
+
     public void updateContentStatus(Content row) {
         SQLiteDatabase db = null;
         try {

@@ -32,6 +32,8 @@ public abstract class ContentTable {
     public static final String UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT = "UPDATE " + TABLE_NAME + " SET " + DOWNLOAD_DATE_COLUMN + " = ?, " + STATUS_COLUMN
             + " = ? WHERE " + ID_COLUMN + " = ?";
 
+    public static final String DELETE_STATEMENT = "DELETE FROM " + TABLE_NAME + " WHERE " + ID_COLUMN + " = ?";
+
     public static final String SELECT_BY_CONTENT_ID = "SELECT " + ID_COLUMN + ", " + FAKKU_ID_COLUMN + ", " + CATEGORY_COLUMN + ", " + URL_COLUMN + ", "
             + TITLE_COLUMN + ", " + HTML_DESCRIPTION_COLUMN + ", " + QTY_PAGES_COLUMN + ", "
             + UPLOAD_DATE_COLUMN + ", " + DOWNLOAD_DATE_COLUMN + ", " + STATUS_COLUMN  + ", " + COVER_IMAGE_URL_COLUMN + " FROM " + TABLE_NAME + " C WHERE C." + ID_COLUMN + " = ?";

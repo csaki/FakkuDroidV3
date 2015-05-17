@@ -145,16 +145,13 @@ public class Helper {
     public static <K> void saveJson(K object, File dir)
             throws IOException {
         File file = new File(dir, Constants.JSON_FILE_NAME);
-
-        if (!file.exists()) {
-            Gson gson = new Gson();
-            // convert java object to JSON format,
-            // and returned as JSON formatted string
-            String json = gson.toJson(object);
-            FileWriter writer = new FileWriter(file);
-            writer.write(json);
-            writer.close();
-        }
+        Gson gson = new Gson();
+        // convert java object to JSON format,
+        // and returned as JSON formatted string
+        String json = gson.toJson(object);
+        FileWriter writer = new FileWriter(file, false);
+        writer.write(json);
+        writer.close();
     }
 
     public static String readTextFile(File f) throws IOException {

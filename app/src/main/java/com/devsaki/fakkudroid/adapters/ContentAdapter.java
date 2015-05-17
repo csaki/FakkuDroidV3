@@ -1,9 +1,12 @@
 package com.devsaki.fakkudroid.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import com.devsaki.fakkudroid.MainActivity;
 import com.devsaki.fakkudroid.R;
+import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
@@ -22,7 +26,10 @@ import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.Helper;
 import com.devsaki.fakkudroid.util.ImageQuality;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,6 +37,7 @@ import java.util.List;
  */
 public class ContentAdapter extends ArrayAdapter<Content> {
 
+    private final static String TAG = ContentAdapter.class.getName();
     private final Context context;
     private final List<Content> contents;
 
@@ -106,7 +114,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteContent(content);
+                deleteContent(content, dir);
             }
         });
         Button btnView = (Button) rowView.findViewById(R.id.btnViewBrowser);
@@ -132,8 +140,30 @@ public class ContentAdapter extends ArrayAdapter<Content> {
             Helper.openFile(new File(dir, "001.jpg"), getContext());
     }
 
-    private void deleteContent(Content content) {
-        Toast.makeText(getContext(), "Test click delete : " + content.getTitle(), Toast.LENGTH_SHORT).show();
+    private void deleteContent(final Content content, final File dir) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setMessage(R.string.ask_delete)
+                .setPositiveButton(android.R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                FakkuDroidDB db = new FakkuDroidDB(getContext());
+
+                                try {
+                                    FileUtils.deleteDirectory(dir);
+                                } catch (IOException e) {
+                                    Log.e(TAG, "error deleting content directory", e);
+                                }
+
+                                db.deleteContent(content);
+
+                                Toast.makeText(getContext(),
+                                        getContext().getResources().getString(R.string.deleted)
+                                                .replace("@content", content.getTitle()),
+                                        Toast.LENGTH_SHORT).show();
+                                contents.remove(content);
+                                notifyDataSetChanged();
+                            }
+                        }).setNegativeButton(android.R.string.no, null).create().show();
     }
 
     private void viewContent(Content content) {
