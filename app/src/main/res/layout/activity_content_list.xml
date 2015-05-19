@@ -8,58 +8,70 @@
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll"></ListView>
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/fabDownloadManager"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:src="@drawable/ic_action_storage"
-        fab:fab_colorNormal="@color/primary"
-        fab:fab_colorPressed="@color/primary_dark"
-        fab:fab_colorRipple="@color/ripple"
-        android:layout_above="@+id/fabRefresh"
-        android:layout_alignParentRight="true"
-        android:layout_margin="3dp"/>
-
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/fabRefresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:src="@drawable/ic_action_refresh"
-        fab:fab_colorNormal="@color/primary"
-        fab:fab_colorPressed="@color/primary_dark"
-        fab:fab_colorRipple="@color/ripple"
-        android:layout_above="@+id/fabBrowser"
-        android:layout_alignParentRight="true"
-        android:layout_margin="3dp"/>
-
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/fabBrowser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:src="@drawable/ic_action_web_site"
-        fab:fab_colorNormal="@color/primary"
-        fab:fab_colorPressed="@color/primary_dark"
-        fab:fab_colorRipple="@color/ripple"
-        android:layout_above="@+id/fabSettings"
-        android:layout_alignParentRight="true"
-        android:layout_margin="3dp"/>
-
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/fabSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:src="@drawable/ic_action_settings"
-        fab:fab_colorNormal="@color/primary"
-        fab:fab_colorPressed="@color/primary_dark"
-        fab:fab_colorRipple="@color/ripple"
-        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_margin="3dp"/>
+        android:background="@drawable/normal_state"
+        android:id="@+id/ll"
+        android:gravity="center">
+        <ImageButton
+            android:id="@+id/btnPrevius"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:src="@drawable/ic_action_previous_item"
+            android:background="@drawable/image_button"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:padding="3dp"/>
+        <Button
+            android:id="@+id/btnPage"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:text="1"/>
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:src="@drawable/ic_action_next_item"
+            android:background="@drawable/image_button"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:padding="3dp"/>
+        <ImageButton
+            android:id="@+id/btnDownloadManager"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:src="@drawable/ic_action_storage"
+            android:background="@drawable/image_button"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:padding="3dp"/>
 
+        <ImageButton
+            android:id="@+id/btnRefresh"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:src="@drawable/ic_action_refresh"
+            android:background="@drawable/image_button"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:padding="3dp"/>
+
+        <ImageButton
+            android:id="@+id/btnBrowser"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:src="@drawable/ic_action_web_site"
+            android:background="@drawable/image_button"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:padding="3dp"/>
+
+
+    </LinearLayout>
 </RelativeLayout>

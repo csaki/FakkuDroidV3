@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.HeaderViewListAdapter;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -20,7 +21,6 @@ import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.service.DownloadManagerService;
-import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,24 +52,24 @@ public class DownloadManagerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manager);
         db = new FakkuDroidDB(this);
-        FloatingActionButton fabDownloads = (FloatingActionButton) findViewById(R.id.fabDownloads);
-        fabDownloads.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnDownloads = (ImageButton) findViewById(R.id.btnDownloads);
+        btnDownloads.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mainActivity = new Intent(DownloadManagerActivity.this, ContentListActivity.class);
                 startActivity(mainActivity);
             }
         });
-        FloatingActionButton fabBrowser = (FloatingActionButton) findViewById(R.id.fabBrowser);
-        fabBrowser.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnBrowser = (ImageButton) findViewById(R.id.btnBrowser);
+        btnBrowser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DownloadManagerActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
-        FloatingActionButton fabStart = (FloatingActionButton) findViewById(R.id.fabStart);
-        fabStart.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnStart = (ImageButton) findViewById(R.id.btnStart);
+        btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 db.updateContentStatus(Status.DOWNLOADING, Status.PAUSED);
@@ -78,8 +78,8 @@ public class DownloadManagerActivity extends ActionBarActivity {
                 startService(intent);
             }
         });
-        FloatingActionButton fabPause = (FloatingActionButton) findViewById(R.id.fabPause);
-        fabPause.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnPause = (ImageButton) findViewById(R.id.btnPause);
+        btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 db.updateContentStatus(Status.PAUSED, Status.DOWNLOADING);

@@ -188,19 +188,15 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
         }
 
         ProgressBar pb = (ProgressBar) rowView.findViewById(R.id.pbDownload);
-        if(DownloadManagerService.isStarted()){
-            if(content.getStatus() == Status.PAUSED){
-                pb.setVisibility(View.INVISIBLE);
-            }else if(content.getPercent()>0){
-                pb.setVisibility(View.VISIBLE);
-                pb.setIndeterminate(false);
-                pb.setProgress((int)content.getPercent());
-            }else{
-                pb.setVisibility(View.VISIBLE);
-                pb.setIndeterminate(true);
-            }
-        }else{
+        if(content.getStatus() == Status.PAUSED){
             pb.setVisibility(View.INVISIBLE);
+        }else if(content.getPercent()>0){
+            pb.setVisibility(View.VISIBLE);
+            pb.setIndeterminate(false);
+            pb.setProgress((int)content.getPercent());
+        }else{
+            pb.setVisibility(View.VISIBLE);
+            pb.setIndeterminate(true);
         }
 
         return rowView;

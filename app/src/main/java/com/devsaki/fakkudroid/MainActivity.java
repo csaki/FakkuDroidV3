@@ -112,13 +112,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void downloadContent() {
-
-        if (Status.DOWNLOADING == currentContent.getStatus() && DownloadManagerService.isStarted()) {
-            Toast.makeText(this, R.string.starting_download_manager, Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
-            startService(intent);
-            return;
-        }
         if (Status.DOWNLOADED == currentContent.getStatus()) {
             Toast.makeText(this, R.string.already_downloaded, Toast.LENGTH_SHORT).show();
             return;

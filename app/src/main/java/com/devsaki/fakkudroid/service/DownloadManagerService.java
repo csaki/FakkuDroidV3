@@ -36,7 +36,6 @@ import java.util.Date;
 public class DownloadManagerService extends IntentService {
 
     private static final String TAG = DownloadManagerService.class.getName();
-    private static boolean started = false;
     public static final String INTENT_PERCENT_BROADCAST = "broadcast_percent";
     public static final String NOTIFICATION = "com.devsaki.fakkudroid.service";
 
@@ -49,7 +48,6 @@ public class DownloadManagerService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate");
-        started = true;
 
         db = new FakkuDroidDB(this);
         notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -59,11 +57,7 @@ public class DownloadManagerService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy");
-        started = false;
-    }
-
-    public static boolean isStarted() {
-        return started;
+        db.updateContentStatus(Status.PAUSED, Status.DOWNLOADING);
     }
 
     public DownloadManagerService() {

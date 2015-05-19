@@ -8,9 +8,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.HeaderViewListAdapter;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -19,7 +19,6 @@ import com.devsaki.fakkudroid.adapters.ContentAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
-import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,23 +37,23 @@ public class ContentListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_content_list);
 
         db = new FakkuDroidDB(this);
-        FloatingActionButton fabBrowser = (FloatingActionButton) findViewById(R.id.fabBrowser);
-        fabBrowser.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnBrowser = (ImageButton) findViewById(R.id.btnBrowser);
+        btnBrowser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ContentListActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
-        FloatingActionButton fabRefresh = (FloatingActionButton) findViewById(R.id.fabRefresh);
-        fabRefresh.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnRefresh = (ImageButton) findViewById(R.id.btnRefresh);
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchContent();
             }
         });
-        FloatingActionButton fabDownloadManager = (FloatingActionButton) findViewById(R.id.fabDownloadManager);
-        fabDownloadManager.setOnClickListener(new View.OnClickListener() {
+        ImageButton btnDownloadManager = (ImageButton) findViewById(R.id.btnDownloadManager);
+        btnDownloadManager.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ContentListActivity.this, DownloadManagerActivity.class);
