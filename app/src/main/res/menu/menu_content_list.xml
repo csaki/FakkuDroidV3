@@ -8,5 +8,5 @@
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="android.widget.SearchView" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="ifRoom" android:icon="@drawable/ic_action_settings"/>
+        android:orderInCategory="100" app:showAsAction="never" android:icon="@drawable/ic_action_settings"/>
 </menu>

@@ -1,8 +1,10 @@
 package com.devsaki.fakkudroid.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -19,7 +21,7 @@ import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.Status;
-import com.devsaki.fakkudroid.service.DownloadManagerService;
+import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
 import com.devsaki.fakkudroid.util.ImageQuality;
 
@@ -35,6 +37,7 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
     private final Context context;
     private final List<Content> contents;
     private LruCache<String, Bitmap> mMemoryCache;
+    private SharedPreferences sharedPreferences;
 
     public ContentDownloadManagerAdapter(Context context, List<Content> contents) {
         super(context, R.layout.row_download, contents);
@@ -56,6 +59,8 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
                 return bitmap.getByteCount() / 1024;
             }
         };
+
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
     }
 
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
@@ -75,7 +80,7 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
         if (bitmap != null) {
             mImageView.setImageBitmap(bitmap);
         } else {
-            mImageView.setImageResource(R.drawable.ic_launcher);
+            mImageView.setImageResource(R.drawable.ic_fakkudroid_launcher);
             BitmapWorkerTask task = new BitmapWorkerTask(mImageView);
             task.execute(file);
         }
@@ -93,9 +98,23 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
         @Override
         protected Bitmap doInBackground(File... params) {
             if(params[0].exists()&&params[0].getAbsolutePath()!=null){
+                String imageQualityPref = sharedPreferences.getString(ConstantsPreferences.PREF_QUALITY_IMAGE_LISTS, ConstantsPreferences.PREF_QUALITY_IMAGE_DEFAULT);
+                ImageQuality imageQuality = ImageQuality.LOW;
+                switch (imageQualityPref){
+                    case "Medium":
+                        imageQuality = ImageQuality.MEDIUM;
+                        break;
+                    case "High":
+                        imageQuality = ImageQuality.HIGH;
+                        break;
+                    case "Low":
+                        imageQuality = ImageQuality.LOW;
+                        break;
+                }
+
                 Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
-                        params[0].getAbsolutePath(), ImageQuality.LOW.getWidth(),
-                        ImageQuality.LOW.getHeight());
+                        params[0].getAbsolutePath(), imageQuality.getWidth(),
+                        imageQuality.getHeight());
                 addBitmapToMemoryCache(params[0].getAbsolutePath(), thumbBitmap);
                 return thumbBitmap;
             }else
@@ -107,7 +126,7 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
             if(bitmap!=null){
                 imageView.setImageBitmap(bitmap);
             }else{
-                imageView.setImageResource(R.drawable.ic_launcher);
+                imageView.setImageResource(R.drawable.ic_fakkudroid_launcher);
             }
         }
     }

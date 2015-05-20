@@ -1,82 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp">
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="10dp">
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/tvTitle"
-        android:singleLine="false"
-        android:layout_gravity="center_horizontal" />
-    <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:singleLine="false"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:textColor="@android:color/holo_red_dark" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/holo_red_light"
+        android:layout_margin="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/ivCover"
             android:layout_width="100dp"
             android:layout_height="140dp"
-            android:layout_margin="1dp"/>
+            android:layout_margin="5dp" />
+
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/tvSerie"
-                android:singleLine="false"
-                android:layout_gravity="center_horizontal" />
-            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_gravity="center_horizontal"
+                android:singleLine="false"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
                 android:id="@+id/tvArtist"
-                android:singleLine="false"
-                android:layout_gravity="center_horizontal" />
-            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:id="@+id/tvTags"
+                android:layout_gravity="center_horizontal"
                 android:singleLine="false"
-                android:layout_gravity="center_horizontal" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/tvTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:singleLine="false"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
 
-            </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/holo_red_light"
+        android:layout_margin="10dp"/>
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
-        
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
+
         <Button
             android:id="@+id/btnViewBrowser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/view_browser"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            style="?android:attr/borderlessButtonStyle"
+            android:textStyle="bold"
+            android:text="@string/view_browser" />
 
         <Button
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/delete"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            style="?android:attr/borderlessButtonStyle"
+            android:textStyle="bold"
+            android:text="@string/delete" />
 
         <Button
             android:id="@+id/btnRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/read"
-            android:layout_weight="3"/>
-        </LinearLayout>
+            android:layout_weight="3"
+            style="?android:attr/borderlessButtonStyle"
+            android:textStyle="bold"
+            android:text="@string/read" />
+    </LinearLayout>
 </LinearLayout>

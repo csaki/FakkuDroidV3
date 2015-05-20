@@ -3,22 +3,27 @@ package com.devsaki.fakkudroid;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.devsaki.fakkudroid.adapters.ContentAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
+import com.devsaki.fakkudroid.util.ConstantsPreferences;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +35,15 @@ public class ContentListActivity extends ActionBarActivity {
     private FakkuDroidDB db;
     private List<Content> contents;
     private static String query = "";
+    private SharedPreferences sharedPreferences;
+    private int currentPage = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_list);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         db = new FakkuDroidDB(this);
         ImageButton btnBrowser = (ImageButton) findViewById(R.id.btnBrowser);
         btnBrowser.setOnClickListener(new View.OnClickListener() {
@@ -60,11 +68,48 @@ public class ContentListActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
+        ImageButton btnNext = (ImageButton) findViewById(R.id.btnNext);
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int qtyPages = sharedPreferences.getInt(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT);
+                if (qtyPages <= 0) {
+                    Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT).show();
+                } else {
+                    currentPage++;
+                    searchContent();
+                }
+            }
+        });
+        ImageButton btnPrevius = (ImageButton) findViewById(R.id.btnPrevius);
+        btnPrevius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int qtyPages = sharedPreferences.getInt(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT);
+                if(qtyPages<=0){
+                    Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT ).show();
+                }else{
+                    if(currentPage>1){
+                        currentPage--;
+                        searchContent();
+                    }else{
+                        Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT ).show();
+                    }
+                }
+            }
+        });
+
+
         searchContent();
     }
 
     private void searchContent() {
-        contents = (List<Content>) db.selectContentByQuery(query);
+        int qtyPages = sharedPreferences.getInt(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT);
+        if(qtyPages>0){
+            contents = (List<Content>) db.selectContentByQuery(query, currentPage, qtyPages);
+        }else{
+            contents = (List<Content>) db.selectContentByQuery(query);
+        }
         if (contents != null) {
             for (Content content : contents) {
                 content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
@@ -77,6 +122,9 @@ public class ContentListActivity extends ActionBarActivity {
         }
         ContentAdapter adapter = new ContentAdapter(this, contents);
         setListAdapter(adapter);
+
+        Button btnPage = (Button) findViewById(R.id.btnPage);
+        btnPage.setText("" + currentPage);
     }
 
     @Override

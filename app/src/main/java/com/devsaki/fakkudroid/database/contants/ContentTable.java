@@ -60,4 +60,16 @@ public abstract class ContentTable {
             + " A ON CA." + ContentAttributeTable.ATTRIBUTE_ID_COLUMN + " = A." + AttributeTable.ID_COLUMN
             + " WHERE A." + AttributeTable.NAME_COLUMN + " like ? AND A." + AttributeTable.TYPE_COLUMN
             + " in (?, ?, ?))) ORDER BY C." + DOWNLOAD_DATE_COLUMN + " DESC";
+
+
+    public static final String SELECT_DOWNLOADS_PAGE = "SELECT C." + ID_COLUMN + ", C." + FAKKU_ID_COLUMN + ", C." + CATEGORY_COLUMN + ", C."
+            + URL_COLUMN + ", C." + TITLE_COLUMN + ", C." + HTML_DESCRIPTION_COLUMN + ", C." + QTY_PAGES_COLUMN + ", C."
+            + UPLOAD_DATE_COLUMN + ", C." + DOWNLOAD_DATE_COLUMN + ", C." + STATUS_COLUMN  + ", C." + COVER_IMAGE_URL_COLUMN
+            + " FROM " + TABLE_NAME + " C WHERE C." + STATUS_COLUMN
+            + " in (?, ?, ?) AND (C." + TITLE_COLUMN + " like ? OR C." + ID_COLUMN + " in ("
+            + "SELECT CA." + ContentAttributeTable.CONTENT_ID_COLUMN + " FROM " + ContentAttributeTable.TABLE_NAME
+            + " CA INNER JOIN " + AttributeTable.TABLE_NAME
+            + " A ON CA." + ContentAttributeTable.ATTRIBUTE_ID_COLUMN + " = A." + AttributeTable.ID_COLUMN
+            + " WHERE A." + AttributeTable.NAME_COLUMN + " like ? AND A." + AttributeTable.TYPE_COLUMN
+            + " in (?, ?, ?))) ORDER BY C." + DOWNLOAD_DATE_COLUMN + " DESC" + " LIMIT ?,?";
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_image_quality_entries">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="pref_image_quality_entry_values">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+
+    <string-array name="pref_quantity_per_page_entries">
+        <item>None limit</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>80</item>
+        <item>100</item>
+    </string-array>
+    <integer-array name="pref_quantity_per_page_entry_values">
+        <item>-1</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>80</item>
+        <item>100</item>
+    </integer-array>
+</resources>

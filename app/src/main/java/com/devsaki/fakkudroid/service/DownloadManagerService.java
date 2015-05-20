@@ -162,7 +162,7 @@ public class DownloadManagerService extends IntentService {
 
         mBuilder = new NotificationCompat.Builder(
                 DownloadManagerService.this).setSmallIcon(
-                R.drawable.ic_launcher).setContentTitle(content.getTitle());
+                R.drawable.ic_fakkudroid_launcher).setContentTitle(content.getTitle());
         showNotification(0, content);
         int count = 0;
         for (ImageFile imageFile : content.getImageFiles()) {

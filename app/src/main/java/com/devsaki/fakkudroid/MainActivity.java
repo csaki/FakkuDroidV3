@@ -197,6 +197,8 @@ public class MainActivity extends ActionBarActivity {
 
         @JavascriptInterface
         public void processHTML(String html) {
+            if(html==null)
+                return;
             Content content = FakkuParser.parseContent(html);
             if (content == null) {
                 return;

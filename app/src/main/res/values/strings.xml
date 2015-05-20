@@ -32,4 +32,8 @@
 
     <string name="ask_delete">Are you sure you wish to delete this content?</string>
     <string name="deleted">Content @content deleted.</string>
+
+    <string name="not_limit_per_page">Not limit per page.</string>
+    <string name="not_previus_page">Not previus page.</string>
+    <string name="error_page_out">Error: Number Page</string>
 </resources>

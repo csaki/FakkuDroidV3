@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,6 +32,7 @@ public class DownloadManagerActivity extends ActionBarActivity {
     private static final String TAG = DownloadManagerActivity.class.getName();
     private FakkuDroidDB db;
     private List<Content> contents;
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
 
         @Override
@@ -87,7 +89,6 @@ public class DownloadManagerActivity extends ActionBarActivity {
                 update();
             }
         });
-        update();
     }
 
     @Override
@@ -100,6 +101,7 @@ public class DownloadManagerActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        update();
         registerReceiver(receiver, new IntentFilter(DownloadManagerService.NOTIFICATION));
     }
 
