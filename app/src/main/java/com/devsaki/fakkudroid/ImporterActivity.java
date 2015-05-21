@@ -149,7 +149,7 @@ public class ImporterActivity extends ActionBarActivity {
                                     content.setDownloadDate(new Date().getTime());
                                     contents.add(content);
                                 } catch (IOException e) {
-                                    Log.e(TAG, "Reading json file", e);
+                                    Log.e(TAG, "Reading json file v2", e);
                                 }
                             }
                         }

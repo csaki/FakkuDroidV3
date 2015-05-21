@@ -16,6 +16,7 @@ import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.Helper;
@@ -57,7 +58,6 @@ public class DownloadManagerService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy");
-        db.updateContentStatus(Status.PAUSED, Status.DOWNLOADING);
     }
 
     public DownloadManagerService() {
@@ -69,7 +69,13 @@ public class DownloadManagerService extends IntentService {
         Content content = db.selectContentByStatus(Status.DOWNLOADING);
         if(content==null||content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR)
             return;
-
+        content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
+        content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
+        content.setPublishers(db.selectAttributesByContentId(content.getId(), AttributeType.PUBLISHER));
+        content.setLanguage(db.selectAttributeByContentId(content.getId(), AttributeType.LANGUAGE));
+        content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
+        content.setTranslators(db.selectAttributesByContentId(content.getId(), AttributeType.TRANSLATOR));
+        content.setUser(db.selectAttributeByContentId(content.getId(), AttributeType.UPLOADER));
         content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
 
         if(paused){

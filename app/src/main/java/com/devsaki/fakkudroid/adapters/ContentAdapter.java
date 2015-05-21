@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.devsaki.fakkudroid.FakkuDroidApplication;
 import com.devsaki.fakkudroid.MainActivity;
 import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
@@ -45,8 +46,6 @@ public class ContentAdapter extends ArrayAdapter<Content> {
     private final static String TAG = ContentAdapter.class.getName();
     private final Context context;
     private final List<Content> contents;
-    private LruCache<String, Bitmap> mMemoryCache;
-    private SharedPreferences sharedPreferences;
 
     public ContentAdapter(Context context, List<Content> contents) {
         super(context, R.layout.row_download, contents);
@@ -60,85 +59,8 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = maxMemory / 8;
 
-        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
-                // The cache size will be measured in kilobytes rather than
-                // number of items.
-                return bitmap.getByteCount() / 1024;
-            }
-        };
-
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
     }
 
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            mMemoryCache.put(key, bitmap);
-        }
-    }
-
-    public Bitmap getBitmapFromMemCache(String key) {
-        return mMemoryCache.get(key);
-    }
-
-    public void loadBitmap(File file, ImageView mImageView) {
-        final String imageKey = file.getAbsolutePath();
-
-        final Bitmap bitmap = getBitmapFromMemCache(imageKey);
-        if (bitmap != null) {
-            mImageView.setImageBitmap(bitmap);
-        } else {
-            mImageView.setImageResource(R.drawable.ic_fakkudroid_launcher);
-            BitmapWorkerTask task = new BitmapWorkerTask(mImageView);
-            task.execute(file);
-        }
-    }
-
-    class BitmapWorkerTask extends AsyncTask<File, Void, Bitmap> {
-
-        private ImageView imageView;
-
-        public BitmapWorkerTask(ImageView imageView) {
-            this.imageView = imageView;
-        }
-
-        // Decode image in background.
-        @Override
-        protected Bitmap doInBackground(File... params) {
-            if(params[0].exists()){
-                String imageQualityPref = sharedPreferences.getString(ConstantsPreferences.PREF_QUALITY_IMAGE_LISTS, ConstantsPreferences.PREF_QUALITY_IMAGE_DEFAULT);
-                ImageQuality imageQuality = ImageQuality.LOW;
-                switch (imageQualityPref){
-                    case "Medium":
-                        imageQuality = ImageQuality.MEDIUM;
-                        break;
-                    case "High":
-                        imageQuality = ImageQuality.HIGH;
-                        break;
-                    case "Low":
-                        imageQuality = ImageQuality.LOW;
-                        break;
-                }
-
-                Bitmap thumbBitmap = Helper.decodeSampledBitmapFromFile(
-                        params[0].getAbsolutePath(), imageQuality.getWidth(),
-                        imageQuality.getHeight());
-                addBitmapToMemoryCache(params[0].getAbsolutePath(), thumbBitmap);
-                return thumbBitmap;
-            }else
-                return null;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if(bitmap!=null){
-                imageView.setImageBitmap(bitmap);
-            }else{
-                imageView.setImageResource(R.drawable.ic_fakkudroid_launcher);
-            }
-        }
-    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -189,7 +111,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         final File dir = Helper.getDownloadDir(content.getFakkuId(), getContext());
         File coverFile = new File(dir, "thumb.jpg");
 
-        loadBitmap(coverFile, ivCover);
+        ((FakkuDroidApplication)getContext().getApplicationContext()).loadBitmap(coverFile, ivCover);
 
         Button btnRead = (Button) rowView.findViewById(R.id.btnRead);
         btnRead.setOnClickListener(new View.OnClickListener() {

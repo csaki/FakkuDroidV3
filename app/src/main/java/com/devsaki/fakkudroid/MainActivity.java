@@ -224,7 +224,7 @@ public class MainActivity extends ActionBarActivity {
                     Log.e(TAG, "Error Save JSON " + content.getTitle(), e);
                 }
             }
-            if (content.isDownloadable()) {
+            if (content.isDownloadable()&&content.getStatus()!=Status.DOWNLOADED) {
                 currentContent = content;
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.show();
