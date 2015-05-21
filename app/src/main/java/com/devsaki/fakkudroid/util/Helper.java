@@ -93,16 +93,6 @@ public class Helper {
         return BitmapFactory.decodeFile(file, options);
     }
 
-    public static void openFile(File aFile, Context context) {
-        Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW);
-        File file = new File(aFile.getAbsolutePath());
-        String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
-        String mimetype = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        myIntent.setDataAndType(Uri.fromFile(file), mimetype);
-
-        context.startActivity(myIntent);
-    }
-
     public static File getDefaultDir(String dir, Context context) {
         File file = null;
         try {

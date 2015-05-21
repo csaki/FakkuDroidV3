@@ -5,12 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +24,10 @@ import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
+import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
-import com.devsaki.fakkudroid.util.ImageQuality;
 
 import org.apache.commons.io.FileUtils;
 
@@ -46,6 +43,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
     private final static String TAG = ContentAdapter.class.getName();
     private final Context context;
     private final List<Content> contents;
+    private SharedPreferences sharedPreferences;
 
     public ContentAdapter(Context context, List<Content> contents) {
         super(context, R.layout.row_download, contents);
@@ -58,7 +56,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
 
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = maxMemory / 8;
-
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
     }
 
 
@@ -111,7 +109,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         final File dir = Helper.getDownloadDir(content.getFakkuId(), getContext());
         File coverFile = new File(dir, "thumb.jpg");
 
-        ((FakkuDroidApplication)getContext().getApplicationContext()).loadBitmap(coverFile, ivCover);
+        ((FakkuDroidApplication) getContext().getApplicationContext()).loadBitmap(coverFile, ivCover);
 
         Button btnRead = (Button) rowView.findViewById(R.id.btnRead);
         btnRead.setOnClickListener(new View.OnClickListener() {
@@ -142,12 +140,22 @@ public class ContentAdapter extends ArrayAdapter<Content> {
             for (ImageFile imageFile : content.getImageFiles()) {
                 File file = new File(dir, imageFile.getName());
                 if (file.exists()) {
-                    Helper.openFile(file, getContext());
+                    int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
+                    if (readContentPreference == 0)
+                        AndroidHelper.openFile(file, getContext());
+                    else
+                        AndroidHelper.openPerfectViewer(file, getContext());
                     return;
                 }
             }
-        else
-            Helper.openFile(new File(dir, "001.jpg"), getContext());
+        else {
+            File file = new File(dir, "001.jpg");
+            int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
+            if (readContentPreference == 0)
+                AndroidHelper.openFile(file, getContext());
+            else
+                AndroidHelper.openPerfectViewer(file, getContext());
+        }
     }
 
     private void deleteContent(final Content content, final File dir) {

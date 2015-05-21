@@ -1,12 +1,7 @@
 package com.devsaki.fakkudroid.adapters;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +17,7 @@ import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.Status;
-import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
-import com.devsaki.fakkudroid.util.ImageQuality;
 
 import java.io.File;
 import java.util.List;

@@ -19,4 +19,21 @@
             android:entries="@array/pref_quantity_per_page_entries"
             android:entryValues="@array/pref_quantity_per_page_entry_values"/>
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_perfomance_category"
+        android:key="pref_key_perfomance_settings">
+
+        <ListPreference
+            android:key="pref_read_content_lists"
+            android:title="@string/pref_read_content_title"
+            android:summary="@string/pref_read_content_summary"
+            android:defaultValue="@string/pref_read_content_default"
+            android:entries="@array/pref_read_content_entries"
+            android:entryValues="@array/pref_read_content_entry_values"/>
+        <Preference android:title="@string/pref_select_folder_title" android:summary="@string/pref_select_folder_summary">
+            <intent android:action="android.intent.action.VIEW"
+                android:targetPackage="com.devsaki.fakkudroid"
+                android:targetClass="com.devsaki.fakkudroid.SelectFolderActivity"/>
+        </Preference>
+    </PreferenceCategory>
 </PreferenceScreen>

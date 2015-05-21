@@ -4,6 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_download_manager">Download Manager</string>
+    <string name="title_activity_preferences">Preferences</string>
 
     <string name="read">Read</string>
     <string name="view_browser">View</string>
@@ -36,4 +37,6 @@
     <string name="not_limit_per_page">Not limit per page.</string>
     <string name="not_previus_page">Not previus page.</string>
     <string name="error_page_out">Error: Number Page</string>
+
+    <string name="error_open_perfect_viewer">Error opening Perfect Viewer</string>
 </resources>

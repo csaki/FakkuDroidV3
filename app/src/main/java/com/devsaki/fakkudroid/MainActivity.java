@@ -52,7 +52,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        WebView webview = (WebView) findViewById(R.id.wbMain);
+        final WebView webview = (WebView) findViewById(R.id.wbMain);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new CustomWebViewClient());
         webview.setWebChromeClient(new WebChromeClient() {
@@ -86,6 +86,13 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(mainActivity);
             }
         });
+        FloatingActionButton fabRefresh = (FloatingActionButton) findViewById(R.id.fabRefresh);
+        fabRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webview.reload();
+            }
+        });
     }
 
 
@@ -105,6 +112,8 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, PreferencesActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -223,6 +232,8 @@ public class MainActivity extends ActionBarActivity {
                 } catch (IOException e) {
                     Log.e(TAG, "Error Save JSON " + content.getTitle(), e);
                 }
+            } else {
+                content.setStatus(contentbd.getStatus());
             }
             if (content.isDownloadable()&&content.getStatus()!=Status.DOWNLOADED) {
                 currentContent = content;

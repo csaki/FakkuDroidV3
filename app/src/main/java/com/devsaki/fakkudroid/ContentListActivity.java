@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HeaderViewListAdapter;
@@ -23,6 +24,7 @@ import com.devsaki.fakkudroid.adapters.ContentAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
+import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.ConstantsPreferences;
 
 import java.util.ArrayList;
@@ -72,7 +74,7 @@ public class ContentListActivity extends ActionBarActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int qtyPages = sharedPreferences.getInt(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT);
+                int qtyPages = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT + ""));
                 if (qtyPages <= 0) {
                     Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT).show();
                 } else {
@@ -85,7 +87,7 @@ public class ContentListActivity extends ActionBarActivity {
         btnPrevius.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int qtyPages = sharedPreferences.getInt(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT);
+                int qtyPages = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT + ""));
                 if(qtyPages<=0){
                     Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT ).show();
                 }else{
@@ -98,13 +100,18 @@ public class ContentListActivity extends ActionBarActivity {
                 }
             }
         });
-
-
-        searchContent();
+        String settingDir = sharedPreferences.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
+        if (settingDir.isEmpty()) {
+            Intent intent = new Intent(this, SelectFolderActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            searchContent();
+        }
     }
 
     private void searchContent() {
-        int qtyPages = sharedPreferences.getInt(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT);
+        int qtyPages = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT + ""));
         if(qtyPages>0){
             contents = (List<Content>) db.selectContentByQuery(query, currentPage, qtyPages);
         }else{
@@ -155,7 +162,25 @@ public class ContentListActivity extends ActionBarActivity {
                 return true;
             }
         });
+        searchView.requestFocusFromTouch();
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, PreferencesActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private ListView mListView;

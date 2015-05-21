@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -23,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class FirstUseActivity extends ActionBarActivity implements
+public class SelectFolderActivity extends ActionBarActivity implements
         DirectoryChooserFragment.OnFragmentInteractionListener {
 
     private DirectoryChooserFragment mDialog;
@@ -31,7 +30,7 @@ public class FirstUseActivity extends ActionBarActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first_use);
+        setContentView(R.layout.activity_select_folder);
 
         mDialog = DirectoryChooserFragment.newInstance("DialogSample", null);
 
@@ -39,27 +38,11 @@ public class FirstUseActivity extends ActionBarActivity implements
                 .getDefaultSharedPreferences(this);
         String settingDir = prefs.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
         if (!settingDir.isEmpty()) {
-            Intent intent = new Intent(this, ContentListActivity.class);
-            startActivity(intent);
-            finish();
+            EditText editText = (EditText) findViewById(R.id.etFolder);
+            editText.setText(settingDir);
         } else {
             selectDefault(null);
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void explore(View view) {
@@ -105,7 +88,7 @@ public class FirstUseActivity extends ActionBarActivity implements
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(FirstUseActivity.this, ImporterActivity.class);
+                            Intent intent = new Intent(SelectFolderActivity.this, ImporterActivity.class);
                             startActivity(intent);
                             finish();
                         }

@@ -18,6 +18,11 @@
             android:launchMode="singleInstance" >
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
@@ -37,19 +42,20 @@
             android:launchMode="singleInstance" >
         </activity>
         <activity
-            android:name=".FirstUseActivity"
+            android:name=".SelectFolderActivity"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name="net.rdrei.android.dirchooser.DirectoryChooserActivity" />
         <activity
             android:name=".ImporterActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        </activity>
+
+        <activity
+            android:name=".PreferencesActivity"
+            android:label="@string/title_activity_preferences"
+            android:launchMode="singleInstance" >
         </activity>
     </application>
 

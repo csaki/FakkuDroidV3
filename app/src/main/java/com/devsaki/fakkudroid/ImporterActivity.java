@@ -39,29 +39,6 @@ public class ImporterActivity extends ActionBarActivity {
         Helper.executeAsyncTask(new ImporterAsyncTask());
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_importer, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     class ImporterAsyncTask extends AsyncTask<Integer,String,List<Content>>{
 
         private File downloadDir;
@@ -110,7 +87,7 @@ public class ImporterActivity extends ActionBarActivity {
                         if(json.exists()){
                             try {
                                 Content content = new Gson().fromJson(Helper.readTextFile(json), Content.class);
-                                if(content.getStatus()== com.devsaki.fakkudroid.database.enums.Status.DOWNLOADING)
+                                if(content.getStatus() != com.devsaki.fakkudroid.database.enums.Status.DOWNLOADED)
                                     content.setStatus(com.devsaki.fakkudroid.database.enums.Status.MIGRATED);
                                 contents.add(content);
                             } catch (IOException e) {

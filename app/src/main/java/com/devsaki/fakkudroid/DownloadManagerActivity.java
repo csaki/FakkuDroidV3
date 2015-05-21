@@ -120,6 +120,8 @@ public class DownloadManagerActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, PreferencesActivity.class);
+            startActivity(intent);
             return true;
         }
 
