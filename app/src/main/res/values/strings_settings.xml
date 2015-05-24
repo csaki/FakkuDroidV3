@@ -16,7 +16,7 @@
     <string name="pref_select_folder_title">Select FakkuDroid Folder</string>
     <string name="pref_select_folder_summary">Select the folder where it is going to be the downloads</string>
     <string name="pref_add_no_media_file_title">Add .nomedia file</string>
-    <string name="pref_add_no_media_file_summary">A .nomedia file is a blank file placed inside a folder. When the media scanner detects the .nomedia file, the media scanner does not scan that folder so the images in that folder don't appear in the Gallery app.</string>
+    <string name="pref_add_no_media_file_summary">A .nomedia file is a blank file placed inside a folder. When the media scanner detects the .nomedia file, the media scanner does not scan that folder so the images in that folder don\'t appear in the Gallery app.</string>
 
     <string name="nomedia_file_created">.nomedia file created.</string>
 </resources>
