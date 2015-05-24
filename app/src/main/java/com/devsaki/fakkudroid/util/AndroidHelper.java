@@ -3,6 +3,8 @@ package com.devsaki.fakkudroid.util;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.StrictMode;
 import android.widget.Toast;
 
 import com.devsaki.fakkudroid.R;
@@ -36,5 +38,15 @@ public class AndroidHelper {
             Toast.makeText(context, R.string.error_open_perfect_viewer,
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static <T> void executeAsyncTask(AsyncTask<T, ?, ?> task,
+                                            T... params) {
+        task.execute(params);
+    }
+
+    public static void ignoreSslErros() {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
     }
 }

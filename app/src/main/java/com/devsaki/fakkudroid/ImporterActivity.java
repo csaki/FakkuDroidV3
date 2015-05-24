@@ -5,15 +5,13 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.enums.AttributeType;
-import com.devsaki.fakkudroid.database.enums.Status;
+import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.Helper;
 import com.devsaki.fakkudroid.v2.bean.DoujinBean;
@@ -36,7 +34,7 @@ public class ImporterActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_importer);
 
-        Helper.executeAsyncTask(new ImporterAsyncTask());
+        AndroidHelper.executeAsyncTask(new ImporterAsyncTask());
     }
 
     class ImporterAsyncTask extends AsyncTask<Integer,String,List<Content>>{

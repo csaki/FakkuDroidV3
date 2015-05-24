@@ -1,8 +1,17 @@
 package com.devsaki.fakkudroid;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.widget.Toast;
+
+import com.devsaki.fakkudroid.util.Constants;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by DevSaki on 20/05/2015.
@@ -22,6 +31,24 @@ public class PreferencesActivity extends PreferenceActivity{
         {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+
+            Preference addNoMediaFile = (Preference) getPreferenceScreen().findPreference("scan_folder");
+            addNoMediaFile.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    SharedPreferences prefs = PreferenceManager
+                            .getDefaultSharedPreferences(getActivity());
+                    String settingDir = prefs.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
+                    File nomedia = new File(settingDir, ".nomedia");
+                    try {
+                        nomedia.createNewFile();
+                    } catch (IOException e) {
+                    }
+                    Toast.makeText(getActivity(), R.string.nomedia_file_created, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
         }
     }
 }

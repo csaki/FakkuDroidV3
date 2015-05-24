@@ -61,17 +61,15 @@ public class SelectFolderActivity extends ActionBarActivity implements
         //Validation folder
         File file = new File(fakkuFolder);
         if (!file.exists()) {
-            if (file.mkdirs()) {
-                File nomedia = new File(fakkuFolder, ".nomedia");
-                try {
-                    nomedia.createNewFile();
-                } catch (IOException e) {
-                    Toast.makeText(this, R.string.error_creating_folder, Toast.LENGTH_SHORT).show();
-                }
-            } else {
+            if (!file.mkdirs()) {
                 Toast.makeText(this, R.string.error_creating_folder, Toast.LENGTH_SHORT).show();
                 return;
             }
+        }
+        File nomedia = new File(fakkuFolder, ".nomedia");
+        try {
+            nomedia.createNewFile();
+        } catch (IOException e) {
         }
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
