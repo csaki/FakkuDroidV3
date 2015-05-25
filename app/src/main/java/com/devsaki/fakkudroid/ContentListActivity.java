@@ -101,12 +101,17 @@ public class ContentListActivity extends ActionBarActivity {
             }
         });
         String settingDir = sharedPreferences.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
+        boolean showMessageSupport = sharedPreferences.getBoolean(ConstantsPreferences.SHOW_MESSAGE_SUPPORT, true);
         if (settingDir.isEmpty()) {
             Intent intent = new Intent(this, SelectFolderActivity.class);
             startActivity(intent);
             finish();
         } else {
             searchContent();
+            if(showMessageSupport){
+                Intent intent = new Intent(this, MessageSupportActivity.class);
+                startActivity(intent);
+            }
         }
     }
 

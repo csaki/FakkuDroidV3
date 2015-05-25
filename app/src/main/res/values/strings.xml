@@ -39,4 +39,8 @@
     <string name="error_page_out">Error: Number Page</string>
 
     <string name="error_open_perfect_viewer">Error opening Perfect Viewer</string>
+    <string name="title_activity_message_support">MessageSupportActivity</string>
+
+
+    <string name="close">Close</string>
 </resources>

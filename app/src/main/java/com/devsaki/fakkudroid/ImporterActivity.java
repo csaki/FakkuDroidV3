@@ -154,6 +154,9 @@ public class ImporterActivity extends ActionBarActivity {
                 return null;
             }
             try{
+                if(urlBean.getDescription()==null){
+                    throw new RuntimeException("Problems loading attribute v2.");
+                }
                 Attribute attribute = new Attribute();
                 attribute.setName(urlBean.getDescription());
                 attribute.setUrl(urlBean.getId());

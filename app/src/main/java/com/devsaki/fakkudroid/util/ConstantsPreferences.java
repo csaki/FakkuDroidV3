@@ -11,4 +11,5 @@ public abstract class ConstantsPreferences {
     public static final int PREF_QUANTITY_PER_PAGE_DEFAULT = 20;
     public static final String PREF_READ_CONTENT_LISTS = "pref_read_content_lists";
     public static final int PREF_READ_CONTENT_DEFAULT = 0;
+    public static final String SHOW_MESSAGE_SUPPORT = "show_message_support_v1";
 }
