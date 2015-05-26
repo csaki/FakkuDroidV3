@@ -134,7 +134,7 @@ public class DownloadManagerService extends IntentService {
                     }
                 }
             }
-            db.insertContent(content);
+            db.insertImageFiles(content);
         }
 
         if(paused){

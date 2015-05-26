@@ -121,6 +121,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void downloadContent() {
+        currentContent = db.selectContentById(currentContent.getId());
         if (Status.DOWNLOADED == currentContent.getStatus()) {
             Toast.makeText(this, R.string.already_downloaded, Toast.LENGTH_SHORT).show();
             return;
@@ -132,9 +133,6 @@ public class MainActivity extends ActionBarActivity {
         db.updateContentStatus(currentContent);
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
         startService(intent);
-
-        FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-        fabDownload.hide();
     }
 
     @Override

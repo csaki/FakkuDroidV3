@@ -110,6 +110,35 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         }
     }
 
+    public void insertImageFiles(Content content) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            SQLiteStatement statement = db.compileStatement(ImageFileTable.INSERT_STATEMENT);
+            SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
+            statementImages.clearBindings();
+            statementImages.bindLong(1, content.getId());
+            statementImages.execute();
+            for (ImageFile row : content.getImageFiles()) {
+                int indexColumn = 1;
+                statement.clearBindings();
+                statement.bindLong(indexColumn++, row.getId());
+                statement.bindLong(indexColumn++, content.getId());
+                statement.bindLong(indexColumn++, row.getOrder());
+                statement.bindString(indexColumn++, row.getUrl());
+                statement.bindString(indexColumn++, row.getName());
+                statement.bindLong(indexColumn++, row.getStatus().getCode());
+                statement.execute();
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+        } finally {
+            if (db != null && db.isOpen())
+                db.close(); // Closing database connection
+        }
+    }
+
     private void insertAttributes(SQLiteDatabase db, Content content, List<Attribute> rows) {
         SQLiteStatement statement = db.compileStatement(Attribute.INSERT_STATEMENT);
         SQLiteStatement statementContentAttribute = db.compileStatement(ContentAttributeTable.INSERT_STATEMENT);
@@ -252,7 +281,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    private Content populateContent(Cursor cursor, SQLiteDatabase db){
+    private Content populateContent(Cursor cursor, SQLiteDatabase db) {
         int indexColumn = 3;
         Content content = new Content();
         content.setUrl(cursor.getString(indexColumn++));
@@ -284,13 +313,13 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             } else if (attribute.getType() == AttributeType.LANGUAGE) {
                 content.setLanguage(attribute);
             } else if (attribute.getType() == AttributeType.TAG) {
-                if(content.getTags()==null)
+                if (content.getTags() == null)
                     content.setTags(new ArrayList<Attribute>());
                 content.getTags().add(attribute);
             } else if (attribute.getType() == AttributeType.TRANSLATOR) {
-                if(content.getTranslators()==null)
-                    content.setTags(new ArrayList<Attribute>());
-                content.getTags().add(attribute);
+                if (content.getTranslators() == null)
+                    content.setTranslators(new ArrayList<Attribute>());
+                content.getTranslators().add(attribute);
             }
         }
         return content;
