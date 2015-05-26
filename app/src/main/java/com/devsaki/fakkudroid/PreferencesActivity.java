@@ -32,7 +32,7 @@ public class PreferencesActivity extends PreferenceActivity{
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
 
-            Preference addNoMediaFile = (Preference) getPreferenceScreen().findPreference("scan_folder");
+            Preference addNoMediaFile = (Preference) getPreferenceScreen().findPreference("pref_add_no_media_file");
             addNoMediaFile.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 
                 @Override
