@@ -114,6 +114,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
+            db.beginTransaction();
             SQLiteStatement statement = db.compileStatement(ImageFileTable.INSERT_STATEMENT);
             SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
             statementImages.clearBindings();

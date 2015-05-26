@@ -133,7 +133,8 @@ public class DownloadManagerActivity extends ActionBarActivity {
         db.updateContentStatus(content);
         update();
         if(content.getId()==contents.get(0).getId()){
-            DownloadManagerService.paused = true;
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, DownloadManagerActivity.this, DownloadManagerService.class);
+            startService(intent);
         }
     }
 

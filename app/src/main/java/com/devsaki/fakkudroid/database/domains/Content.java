@@ -52,7 +52,7 @@ public class Content extends ContentTable{
     @Expose(serialize = false, deserialize = false)
     private double percent;
 
-    public Integer getId() {
+    public int getId() {
         return url.hashCode();
     }
 
