@@ -164,14 +164,7 @@ public class DownloadManagerActivity extends ActionBarActivity {
 
     public void update(){
         contents = (List<Content>) db.selectContentInDownloadManager();
-        if (contents != null) {
-            for (Content content : contents) {
-                content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
-                content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
-                content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
-                content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
-            }
-        }else{
+        if (contents == null) {
             contents = new ArrayList<>();
         }
         ContentDownloadManagerAdapter adapter = new ContentDownloadManagerAdapter(this, contents);

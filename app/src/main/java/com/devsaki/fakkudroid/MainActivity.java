@@ -239,6 +239,8 @@ public class MainActivity extends ActionBarActivity {
                 currentContent = content;
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.show();
+                WebView webview = (WebView) findViewById(R.id.wbMain);
+                webview.stopLoading();
             }else {
                 FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
                 fabDownload.hide();

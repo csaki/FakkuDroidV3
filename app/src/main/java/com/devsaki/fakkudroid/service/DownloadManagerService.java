@@ -69,14 +69,6 @@ public class DownloadManagerService extends IntentService {
         Content content = db.selectContentByStatus(Status.DOWNLOADING);
         if(content==null||content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR)
             return;
-        content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
-        content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
-        content.setPublishers(db.selectAttributesByContentId(content.getId(), AttributeType.PUBLISHER));
-        content.setLanguage(db.selectAttributeByContentId(content.getId(), AttributeType.LANGUAGE));
-        content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
-        content.setTranslators(db.selectAttributesByContentId(content.getId(), AttributeType.TRANSLATOR));
-        content.setUser(db.selectAttributeByContentId(content.getId(), AttributeType.UPLOADER));
-        content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
 
         if(paused){
             paused = false;

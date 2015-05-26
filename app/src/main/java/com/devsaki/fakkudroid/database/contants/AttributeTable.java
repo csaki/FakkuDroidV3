@@ -20,5 +20,5 @@ public abstract class AttributeTable {
 
     public static final String SELECT_BY_CONTENT_ID = "SELECT T." + ID_COLUMN + ", T." + URL_COLUMN + ", T." + NAME_COLUMN
             + ", T." + TYPE_COLUMN + " FROM " + TABLE_NAME + " T INNER JOIN " + ContentAttributeTable.TABLE_NAME
-            + " C ON T." + ID_COLUMN + " = C." + ContentAttributeTable.ATTRIBUTE_ID_COLUMN + " WHERE C." + ContentAttributeTable.CONTENT_ID_COLUMN + " = ? AND T." + TYPE_COLUMN + " = ?";
+            + " C ON T." + ID_COLUMN + " = C." + ContentAttributeTable.ATTRIBUTE_ID_COLUMN + " WHERE C." + ContentAttributeTable.CONTENT_ID_COLUMN + " = ?";
 }

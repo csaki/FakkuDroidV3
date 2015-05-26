@@ -122,14 +122,7 @@ public class ContentListActivity extends ActionBarActivity {
         }else{
             contents = (List<Content>) db.selectContentByQuery(query);
         }
-        if (contents != null) {
-            for (Content content : contents) {
-                content.setArtists(db.selectAttributesByContentId(content.getId(), AttributeType.ARTIST));
-                content.setSerie(db.selectAttributeByContentId(content.getId(), AttributeType.SERIE));
-                content.setTags(db.selectAttributesByContentId(content.getId(), AttributeType.TAG));
-                content.setImageFiles(db.selectImageFilesByContentId(content.getId()));
-            }
-        }else{
+        if (contents == null) {
             contents = new ArrayList<>();
         }
         ContentAdapter adapter = new ContentAdapter(this, contents);
@@ -156,6 +149,7 @@ public class ContentListActivity extends ActionBarActivity {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 query = s;
+                currentPage = 1;
                 searchContent();
                 return true;
             }
@@ -163,6 +157,7 @@ public class ContentListActivity extends ActionBarActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 query = s;
+                currentPage = 1;
                 searchContent();
                 return true;
             }

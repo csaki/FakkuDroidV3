@@ -81,7 +81,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 statement.bindString(indexColumn++, row.getCoverImageUrl());
                 statement.execute();
 
-                if(row.getImageFiles()!=null)
+                if (row.getImageFiles() != null)
                     insertImageFiles(db, row);
 
                 List<Attribute> attributes = new ArrayList<>();
@@ -156,16 +156,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
-                int indexColumn = 3;
-                result = new Content();
-                result.setUrl(cursor.getString(indexColumn++));
-                result.setTitle(cursor.getString(indexColumn++));
-                result.setHtmlDescription(cursor.getString(indexColumn++));
-                result.setQtyPages(cursor.getInt(indexColumn++));
-                result.setUploadDate(cursor.getLong(indexColumn++));
-                result.setDownloadDate(cursor.getLong(indexColumn++));
-                result.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                result.setCoverImageUrl(cursor.getString(indexColumn++));
+                result = populateContent(cursor, db);
             }
         } finally {
             if (db != null && db.isOpen())
@@ -183,18 +174,8 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
 
-            // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
-                int indexColumn = 3;
-                result = new Content();
-                result.setUrl(cursor.getString(indexColumn++));
-                result.setTitle(cursor.getString(indexColumn++));
-                result.setHtmlDescription(cursor.getString(indexColumn++));
-                result.setQtyPages(cursor.getInt(indexColumn++));
-                result.setUploadDate(cursor.getLong(indexColumn++));
-                result.setDownloadDate(cursor.getLong(indexColumn++));
-                result.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                result.setCoverImageUrl(cursor.getString(indexColumn++));
+                result = populateContent(cursor, db);
             }
         } finally {
             if (db != null && db.isOpen())
@@ -215,18 +196,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
-                    int indexColumn = 3;
-                    Content content = new Content();
-                    content.setUrl(cursor.getString(indexColumn++));
-                    content.setTitle(cursor.getString(indexColumn++));
-                    content.setHtmlDescription(cursor.getString(indexColumn++));
-                    content.setQtyPages(cursor.getInt(indexColumn++));
-                    content.setUploadDate(cursor.getLong(indexColumn++));
-                    content.setDownloadDate(cursor.getLong(indexColumn++));
-                    content.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                    content.setCoverImageUrl(cursor.getString(indexColumn++));
-
-                    result.add(content);
+                    result.add(populateContent(cursor, db));
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -243,23 +213,12 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         try {
             query = "%" + query + "%";
             db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST + "", AttributeType.TAG + "", AttributeType.SERIE + ""});
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE + ""});
 
             if (cursor.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
-                    int indexColumn = 3;
-                    Content content = new Content();
-                    content.setUrl(cursor.getString(indexColumn++));
-                    content.setTitle(cursor.getString(indexColumn++));
-                    content.setHtmlDescription(cursor.getString(indexColumn++));
-                    content.setQtyPages(cursor.getInt(indexColumn++));
-                    content.setUploadDate(cursor.getLong(indexColumn++));
-                    content.setDownloadDate(cursor.getLong(indexColumn++));
-                    content.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                    content.setCoverImageUrl(cursor.getString(indexColumn++));
-
-                    result.add(content);
+                    result.add(populateContent(cursor, db));
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -273,27 +232,16 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     public List<Content> selectContentByQuery(String query, int page, int qty) {
         List<Content> result = null;
         SQLiteDatabase db = null;
-        int start = (page-1)*qty;
+        int start = (page - 1) * qty;
         try {
             query = "%" + query + "%";
             db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST + "", AttributeType.TAG + "", AttributeType.SERIE + "", start + "", qty + ""});
+            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
 
             if (cursor.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
-                    int indexColumn = 3;
-                    Content content = new Content();
-                    content.setUrl(cursor.getString(indexColumn++));
-                    content.setTitle(cursor.getString(indexColumn++));
-                    content.setHtmlDescription(cursor.getString(indexColumn++));
-                    content.setQtyPages(cursor.getInt(indexColumn++));
-                    content.setUploadDate(cursor.getLong(indexColumn++));
-                    content.setDownloadDate(cursor.getLong(indexColumn++));
-                    content.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                    content.setCoverImageUrl(cursor.getString(indexColumn++));
-
-                    result.add(content);
+                    result.add(populateContent(cursor, db));
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -304,67 +252,89 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    public List<ImageFile> selectImageFilesByContentId(int id) {
+    private Content populateContent(Cursor cursor, SQLiteDatabase db){
+        int indexColumn = 3;
+        Content content = new Content();
+        content.setUrl(cursor.getString(indexColumn++));
+        content.setTitle(cursor.getString(indexColumn++));
+        content.setHtmlDescription(cursor.getString(indexColumn++));
+        content.setQtyPages(cursor.getInt(indexColumn++));
+        content.setUploadDate(cursor.getLong(indexColumn++));
+        content.setDownloadDate(cursor.getLong(indexColumn++));
+        content.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+        content.setCoverImageUrl(cursor.getString(indexColumn++));
+
+        content.setImageFiles(selectImageFilesByContentId(db, content.getId()));
+
+        //populate attributes
+        List<Attribute> attributes = selectAttributesByContentId(db, content.getId());
+        for (Attribute attribute : attributes) {
+            if (attribute.getType() == AttributeType.ARTIST) {
+                if (content.getArtists() == null)
+                    content.setArtists(new ArrayList<Attribute>());
+                content.getArtists().add(attribute);
+            } else if (attribute.getType() == AttributeType.SERIE) {
+                content.setSerie(attribute);
+            } else if (attribute.getType() == AttributeType.PUBLISHER) {
+                if (content.getPublishers() == null)
+                    content.setPublishers(new ArrayList<Attribute>());
+                content.getPublishers().add(attribute);
+            } else if (attribute.getType() == AttributeType.UPLOADER) {
+                content.setUser(attribute);
+            } else if (attribute.getType() == AttributeType.LANGUAGE) {
+                content.setLanguage(attribute);
+            } else if (attribute.getType() == AttributeType.TAG) {
+                if(content.getTags()==null)
+                    content.setTags(new ArrayList<Attribute>());
+                content.getTags().add(attribute);
+            } else if (attribute.getType() == AttributeType.TRANSLATOR) {
+                if(content.getTranslators()==null)
+                    content.setTags(new ArrayList<Attribute>());
+                content.getTags().add(attribute);
+            }
+        }
+        return content;
+    }
+
+    private List<ImageFile> selectImageFilesByContentId(SQLiteDatabase db, int id) {
         List<ImageFile> result = null;
-        SQLiteDatabase db = null;
-        try {
+        Cursor cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
-            db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
-
-            // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
-                result = new ArrayList<>();
-                do {
-                    int indexColumn = 2;
-                    ImageFile item = new ImageFile();
-                    item.setOrder(cursor.getInt(indexColumn++));
-                    item.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
-                    item.setUrl(cursor.getString(indexColumn++));
-                    item.setName(cursor.getString(indexColumn++));
-                    result.add(item);
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            result = new ArrayList<>();
+            do {
+                int indexColumn = 2;
+                ImageFile item = new ImageFile();
+                item.setOrder(cursor.getInt(indexColumn++));
+                item.setStatus(Status.searchByCode(cursor.getInt(indexColumn++)));
+                item.setUrl(cursor.getString(indexColumn++));
+                item.setName(cursor.getString(indexColumn++));
+                result.add(item);
+            } while (cursor.moveToNext());
         }
 
         return result;
     }
 
-    public Attribute selectAttributeByContentId(int id, AttributeType type) {
-        List<Attribute> result = selectAttributesByContentId(id, type);
-        if (result == null)
-            return null;
-        return result.get(0);
-    }
-
-    public List<Attribute> selectAttributesByContentId(int id, AttributeType type) {
+    private List<Attribute> selectAttributesByContentId(SQLiteDatabase db, int id) {
         List<Attribute> result = null;
-        SQLiteDatabase db = null;
-        try {
 
-            db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + "", type.getCode() + ""});
+        db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
-            // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
-                result = new ArrayList<>();
-                do {
-                    int indexColumn = 1;
-                    Attribute item = new Attribute();
-                    item.setUrl(cursor.getString(indexColumn++));
-                    item.setName(cursor.getString(indexColumn++));
-                    item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
-                    result.add(item);
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            result = new ArrayList<>();
+            do {
+                int indexColumn = 1;
+                Attribute item = new Attribute();
+                item.setUrl(cursor.getString(indexColumn++));
+                item.setName(cursor.getString(indexColumn++));
+                item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
+                result.add(item);
+            } while (cursor.moveToNext());
         }
-
         return result;
     }
 
