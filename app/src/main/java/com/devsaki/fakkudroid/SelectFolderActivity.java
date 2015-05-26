@@ -92,7 +92,14 @@ public class SelectFolderActivity extends ActionBarActivity implements
                         }
 
                     })
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+
+                    })
                     .show();
         } else {
             Intent intent = new Intent(this, ContentListActivity.class);
