@@ -88,14 +88,14 @@ public class ContentListActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 int qtyPages = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT + ""));
-                if(qtyPages<=0){
-                    Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT ).show();
-                }else{
-                    if(currentPage>1){
+                if (qtyPages <= 0) {
+                    Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT).show();
+                } else {
+                    if (currentPage > 1) {
                         currentPage--;
                         searchContent();
-                    }else{
-                        Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT ).show();
+                    } else {
+                        Toast.makeText(ContentListActivity.this, R.string.not_limit_per_page, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -108,7 +108,7 @@ public class ContentListActivity extends ActionBarActivity {
             finish();
         } else {
             searchContent();
-            if(showMessageSupport){
+            if (showMessageSupport) {
                 Intent intent = new Intent(this, MessageSupportActivity.class);
                 startActivity(intent);
             }
@@ -117,14 +117,19 @@ public class ContentListActivity extends ActionBarActivity {
 
     private void searchContent() {
         int qtyPages = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT + ""));
-        if(qtyPages>0){
+        if (qtyPages > 0) {
             contents = (List<Content>) db.selectContentByQuery(query, currentPage, qtyPages);
-        }else{
+        } else {
             contents = (List<Content>) db.selectContentByQuery(query);
         }
         if (contents == null) {
             contents = new ArrayList<>();
         }
+        if (query.isEmpty())
+            setTitle(R.string.app_name);
+        else
+            setTitle(getResources().getString(R.string.title_activity_search).replace("@search", query));
+
         ContentAdapter adapter = new ContentAdapter(this, contents);
         setListAdapter(adapter);
 
@@ -140,15 +145,16 @@ public class ContentListActivity extends ActionBarActivity {
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
+        final SearchView searchView =
                 (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                query = s;
+                query = s.trim();
                 currentPage = 1;
                 searchContent();
                 return true;
@@ -156,13 +162,11 @@ public class ContentListActivity extends ActionBarActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                query = s;
-                currentPage = 1;
+                query = s.trim();
                 searchContent();
                 return true;
             }
         });
-        searchView.requestFocusFromTouch();
         return true;
     }
 
@@ -196,12 +200,4 @@ public class ContentListActivity extends ActionBarActivity {
         getListView().setAdapter(adapter);
     }
 
-    private ListAdapter getListAdapter() {
-        ListAdapter adapter = getListView().getAdapter();
-        if (adapter instanceof HeaderViewListAdapter) {
-            return ((HeaderViewListAdapter) adapter).getWrappedAdapter();
-        } else {
-            return adapter;
-        }
-    }
 }
