@@ -107,9 +107,9 @@ public class ImporterActivity extends ActionBarActivity {
                                         artists = new ArrayList<>(1);
                                         artists.add(artist);
                                     }
+                                    content.setArtists(artists);
                                     content.setCoverImageUrl(doujinBean.getUrlImageTitle());
                                     content.setQtyPages(doujinBean.getQtyPages());
-                                    content.setArtists(artists);
                                     Attribute translator = from(doujinBean.getTranslator(), AttributeType.TRANSLATOR);
                                     List<Attribute> translators = null;
                                     if(translator!=null){

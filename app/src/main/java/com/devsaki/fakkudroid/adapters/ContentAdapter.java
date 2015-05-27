@@ -79,10 +79,10 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         TextView tvTags = (TextView) rowView.findViewById(R.id.tvTags);
 
         tvTitle.setText(content.getTitle());
-        if (content.getSerie() != null)
-            tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", content.getSerie().getName())));
-        else
-            tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", "")));
+        String serie = null;
+
+        serie = content.getSerie()!=null?content.getSerie().getName()!=null?content.getSerie().getName():"":"";
+        tvSerie.setText(Html.fromHtml(templateTvSerie.replace("@serie@", serie)));
 
         String artists = "";
         if (content.getArtists() != null)
@@ -99,9 +99,11 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         if (content.getTags() != null)
             for (int i = 0; i < content.getTags().size(); i++) {
                 Attribute attribute = content.getTags().get(i);
-                tags += templateTvTags.replace("@tag@", attribute.getName());
-                if (i != content.getTags().size() - 1) {
-                    tags += ", ";
+                if(attribute.getName()==null){
+                    tags += templateTvTags.replace("@tag@", attribute.getName());
+                    if (i != content.getTags().size() - 1) {
+                        tags += ", ";
+                    }
                 }
             }
         tvTags.setText(Html.fromHtml(tags));
