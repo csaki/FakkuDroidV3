@@ -44,5 +44,6 @@
     <string name="title_activity_message_support">MessageSupportActivity</string>
 
 
+    <string name="crash_app">Send me the log by email, please.</string>
     <string name="close">Close</string>
 </resources>

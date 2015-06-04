@@ -30,4 +30,5 @@ dependencies {
     compile 'net.rdrei.android.dirchooser:library:2.1@aar'
     compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
     compile 'commons-io:commons-io:2.4'
+    compile 'ch.acra:acra:4.6.1'
 }
