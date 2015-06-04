@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="main_menu">
+        <item>Browser</item>
+        <item>Home</item>
+        <item>Manga</item>
+        <item>Doujinshi</item>
+        <item>Downloads</item>
+        <item>Download Manager</item>
+        <item>Check for updates</item>
+        <item>Preferences</item>
+    </string-array>
+</resources>

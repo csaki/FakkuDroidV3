@@ -66,6 +66,9 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             SQLiteStatement statement = db.compileStatement(Content.INSERT_STATEMENT);
             db.beginTransaction();
             for (Content row : rows) {
+
+                deleteContent(db, row);
+
                 int indexColumn = 1;
                 statement.clearBindings();
                 statement.bindLong(indexColumn++, row.getId());
@@ -237,36 +240,30 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    public List<Content> selectContentByQuery(String query) {
-        List<Content> result = null;
-        SQLiteDatabase db = null;
-        try {
-            query = "%" + query + "%";
-            db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE + ""});
-
-            if (cursor.moveToFirst()) {
-                result = new ArrayList<>();
-                do {
-                    result.add(populateContent(cursor, db));
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
-        }
-
-        return result;
+    public List<Content> selectContentByQuery(String query, boolean orderAlphabetic) {
+        return selectContentByQuery(query, 1, -1, orderAlphabetic);
     }
 
-    public List<Content> selectContentByQuery(String query, int page, int qty) {
+    public List<Content> selectContentByQuery(String query, int page, int qty, boolean orderAlphabetic) {
         List<Content> result = null;
         SQLiteDatabase db = null;
         int start = (page - 1) * qty;
         try {
             query = "%" + query + "%";
             db = this.getWritableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_DOWNLOADS_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
+            String sql = ContentTable.SELECT_DOWNLOADS;
+            if(orderAlphabetic){
+                sql += ContentTable.ORDER_ALPHABETIC;
+            }else{
+                sql += ContentTable.ORDER_BY_DATE;
+            }
+            Cursor cursor = null;
+            if(qty<0){
+                cursor = db.rawQuery(sql, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + ""});
+            }else{
+                cursor = db.rawQuery(sql + ContentTable.LIMIT_BY_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
+            }
+
 
             if (cursor.moveToFirst()) {
                 result = new ArrayList<>();
@@ -385,6 +382,23 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
+    }
+
+    private void deleteContent(SQLiteDatabase db, Content content) {
+        SQLiteStatement statement = db.compileStatement(ContentTable.DELETE_STATEMENT);
+        SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
+        SQLiteStatement statementAttributes = db.compileStatement(ContentAttributeTable.DELETE_STATEMENT);
+        db.beginTransaction();
+        int indexColumn = 1;
+        statement.clearBindings();
+        statement.bindLong(indexColumn, content.getId());
+        statement.execute();
+        statementImages.clearBindings();
+        statementImages.bindLong(indexColumn, content.getId());
+        statementImages.execute();
+        statementAttributes.clearBindings();
+        statementAttributes.bindLong(indexColumn, content.getId());
+        statementAttributes.execute();
     }
 
     public void deleteContent(Content content) {

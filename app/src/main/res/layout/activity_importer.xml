@@ -11,7 +11,7 @@
     android:orientation="vertical"
     tools:context="com.devsaki.fakkudroid.ImporterActivity">
 
-    <com.devsaki.components.SquareLinearLayout
+    <com.devsaki.fakkudroid.components.SquareLinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -24,7 +24,7 @@
             android:layout_centerVertical="true"
             custom:donut_progress="0" />
 
-    </com.devsaki.components.SquareLinearLayout>
+    </com.devsaki.fakkudroid.components.SquareLinearLayout>
 
     <TextView
         android:id="@+id/tvCurrentStatus"

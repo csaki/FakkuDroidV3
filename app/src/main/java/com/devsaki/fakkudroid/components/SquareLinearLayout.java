@@ -1,4 +1,4 @@
-package com.devsaki.components;
+package com.devsaki.fakkudroid.components;
 
 import android.content.Context;
 import android.util.AttributeSet;

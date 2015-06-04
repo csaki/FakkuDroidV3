@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.HeaderViewListAdapter;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -23,7 +22,6 @@ import android.widget.Toast;
 import com.devsaki.fakkudroid.adapters.ContentAdapter;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
-import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.ConstantsPreferences;
 
@@ -43,7 +41,7 @@ public class ContentListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content_list);
+        setContentView(R.layout.fragment_content_list);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         db = new FakkuDroidDB(this);
@@ -116,11 +114,12 @@ public class ContentListActivity extends ActionBarActivity {
     }
 
     private void searchContent() {
+        int order = sharedPreferences.getInt(ConstantsPreferences.PREF_ORDER_CONTENT_LISTS, ConstantsPreferences.PREF_ORDER_CONTENT_BY_DATE);
         int qtyPages = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_QUANTITY_PER_PAGE_LISTS, ConstantsPreferences.PREF_QUANTITY_PER_PAGE_DEFAULT + ""));
         if (qtyPages > 0) {
-            contents = (List<Content>) db.selectContentByQuery(query, currentPage, qtyPages);
+            contents = (List<Content>) db.selectContentByQuery(query, currentPage, qtyPages, order==ConstantsPreferences.PREF_ORDER_CONTENT_ALPHABETIC);
         } else {
-            contents = (List<Content>) db.selectContentByQuery(query);
+            contents = (List<Content>) db.selectContentByQuery(query, order==ConstantsPreferences.PREF_ORDER_CONTENT_ALPHABETIC);
         }
         if (contents == null) {
             contents = new ArrayList<>();
@@ -141,6 +140,8 @@ public class ContentListActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_content_list, menu);
+
+
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
@@ -181,6 +182,18 @@ public class ContentListActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, PreferencesActivity.class);
             startActivity(intent);
+            return true;
+        }else if (id == R.id.action_order_alphabetic) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(ConstantsPreferences.PREF_ORDER_CONTENT_LISTS, ConstantsPreferences.PREF_ORDER_CONTENT_ALPHABETIC);
+            editor.commit();
+            searchContent();
+            return true;
+        }else if (id == R.id.action_order_by_date) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(ConstantsPreferences.PREF_ORDER_CONTENT_LISTS, ConstantsPreferences.PREF_ORDER_CONTENT_BY_DATE);
+            editor.commit();
+            searchContent();
             return true;
         }
 
