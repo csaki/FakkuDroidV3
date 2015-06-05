@@ -10,10 +10,12 @@ import android.widget.ImageView;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.enums.Status;
+import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
 import com.devsaki.fakkudroid.util.ImageQuality;
 
+import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
@@ -22,7 +24,8 @@ import java.io.File;
 /**
  * Created by DevSaki on 20/05/2015.
  */
-@ReportsCrashes(mailTo = "devsaki.br@gmail.com",
+@ReportsCrashes(formUri = "",
+        mailTo = "devsaki.br@gmail.com",
         mode = ReportingInteractionMode.TOAST,
         resToastText = R.string.crash_app)
 public class FakkuDroidApplication extends Application{
@@ -33,6 +36,10 @@ public class FakkuDroidApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ACRA.init(this);
+
+        AndroidHelper.ignoreSslErros();
 
         FakkuDroidDB db = new FakkuDroidDB(this);
         db.updateContentStatus(Status.PAUSED, Status.DOWNLOADING);

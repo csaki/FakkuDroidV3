@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import com.devsaki.fakkudroid.database.contants.AttributeTable;
 import com.devsaki.fakkudroid.database.contants.ContentAttributeTable;
@@ -24,6 +25,9 @@ import java.util.List;
  * Created by DevSaki on 10/05/2015.
  */
 public class FakkuDroidDB extends SQLiteOpenHelper {
+
+    private static final String TAG = FakkuDroidDB.class.getName();
+
     // All Static variables
     // Database Version
     private static final int DATABASE_VERSION = 1;
@@ -60,6 +64,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void insertContents(Content[] rows) {
+        Log.i(TAG, "insertContents");
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
@@ -108,12 +113,14 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db.endTransaction();
 
         } finally {
+            Log.i(TAG, "insertContents - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
     }
 
     public void insertImageFiles(Content content) {
+        Log.i(TAG, "insertImageFiles");
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
@@ -138,6 +145,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db.endTransaction();
 
         } finally {
+            Log.i(TAG, "insertImageFiles - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
@@ -180,6 +188,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public Content selectContentById(int id) {
+        Log.i(TAG, "selectContentById");
         Content result = null;
         SQLiteDatabase db = null;
         try {
@@ -192,6 +201,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 result = populateContent(cursor, db);
             }
         } finally {
+            Log.i(TAG, "selectContentById - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
@@ -200,6 +210,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public Content selectContentByStatus(Status status) {
+        Log.i(TAG, "selectContentByStatus");
         Content result = null;
         SQLiteDatabase db = null;
         try {
@@ -211,6 +222,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 result = populateContent(cursor, db);
             }
         } finally {
+            Log.i(TAG, "selectContentByStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
@@ -219,6 +231,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public List<Content> selectContentInDownloadManager() {
+        Log.i(TAG, "selectContentInDownloadManager");
         List<Content> result = null;
         SQLiteDatabase db = null;
         try {
@@ -233,6 +246,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 } while (cursor.moveToNext());
             }
         } finally {
+            Log.i(TAG, "selectContentInDownloadManager - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
@@ -245,6 +259,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public List<Content> selectContentByQuery(String query, int page, int qty, boolean orderAlphabetic) {
+        Log.i(TAG, "selectContentByQuery");
         List<Content> result = null;
         SQLiteDatabase db = null;
         int start = (page - 1) * qty;
@@ -272,6 +287,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 } while (cursor.moveToNext());
             }
         } finally {
+            Log.i(TAG, "selectContentByQuery - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
@@ -346,8 +362,6 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
     private List<Attribute> selectAttributesByContentId(SQLiteDatabase db, int id) {
         List<Attribute> result = null;
-
-        db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
         // looping through all rows and adding to list
@@ -366,6 +380,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void updateImageFileStatus(ImageFile row) {
+        Log.i(TAG, "updateImageFileStatus");
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
@@ -379,6 +394,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
             db.endTransaction();
         } finally {
+            Log.i(TAG, "updateImageFileStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
@@ -388,7 +404,6 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         SQLiteStatement statement = db.compileStatement(ContentTable.DELETE_STATEMENT);
         SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
         SQLiteStatement statementAttributes = db.compileStatement(ContentAttributeTable.DELETE_STATEMENT);
-        db.beginTransaction();
         int indexColumn = 1;
         statement.clearBindings();
         statement.bindLong(indexColumn, content.getId());
@@ -402,6 +417,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void deleteContent(Content content) {
+        Log.i(TAG, "deleteContent");
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
@@ -422,12 +438,14 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
             db.endTransaction();
         } finally {
+            Log.i(TAG, "deleteContent - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
     }
 
     public void updateContentStatus(Content row) {
+        Log.i(TAG, "updateContentStatus");
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
@@ -442,12 +460,14 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
             db.endTransaction();
         } finally {
+            Log.i(TAG, "updateContentStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
     }
 
     public void updateContentStatus(Status updateTo, Status updateFrom) {
+        Log.i(TAG, "updateContentStatus2");
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
@@ -461,6 +481,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
             db.endTransaction();
         } finally {
+            Log.i(TAG, "updateContentStatus2 - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
         }
