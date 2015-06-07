@@ -65,13 +65,11 @@ public class DownloadManagerActivity extends FakkuDroidActivity<DownloadManagerA
 
     public static class DownloadManagerFragment extends FakkuDroidFragment{
 
-        private ListView mListView;
         private List<Content> contents;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_download_manager, container, false);
-            mListView = (ListView) rootView.findViewById(R.id.list);
 
             ImageButton btnStart = (ImageButton)rootView.findViewById(R.id.btnStart);
             btnStart.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +90,7 @@ public class DownloadManagerActivity extends FakkuDroidActivity<DownloadManagerA
                     update();
                 }
             });
-            return super.onCreateView(inflater, container, savedInstanceState);
+            return rootView;
         }
 
         public void resume(Content content){
@@ -126,7 +124,8 @@ public class DownloadManagerActivity extends FakkuDroidActivity<DownloadManagerA
         public void updatePercent(double percent){
             if(contents!=null&&!contents.isEmpty()){
                 contents.get(0).setPercent(percent);
-                ((ArrayAdapter<Content>)mListView.getAdapter()).notifyDataSetChanged();
+
+                ((ArrayAdapter) getListAdapter()).notifyDataSetChanged();
             }
         }
 
@@ -136,7 +135,7 @@ public class DownloadManagerActivity extends FakkuDroidActivity<DownloadManagerA
                 contents = new ArrayList<>();
             }
             ContentDownloadManagerAdapter adapter = new ContentDownloadManagerAdapter(getActivity(), contents);
-            mListView.setAdapter(adapter);
+            setListAdapter(adapter);
         }
     }
 }

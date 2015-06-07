@@ -4,8 +4,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.DownloadsFragment> {
+public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.ContentListFragment> {
 
-    private static final String TAG = DownloadsActivity.class.getName();
+    private static final String TAG = ContentListActivity.class.getName();
 
     @Override
-    protected DownloadsFragment buildFragment() {
-        return new DownloadsFragment();
+    protected ContentListFragment buildFragment() {
+        return new ContentListFragment();
     }
 
     @Override
@@ -94,20 +94,20 @@ public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.Down
         return super.onOptionsItemSelected(item);
     }
 
-    public static class DownloadsFragment extends FakkuDroidFragment{
+    public static class ContentListFragment extends FakkuDroidFragment{
         private static String query = "";
         private int currentPage = 1;
         private List<Content> contents;
 
         public void setQuery(String query) {
-            DownloadsFragment.query = query;
+            ContentListFragment.query = query;
             currentPage = 1;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_downloads, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_content_list, container, false);
             btnPage = (Button) rootView.findViewById(R.id.btnPage);
 
             ImageButton btnRefresh = (ImageButton) rootView.findViewById(R.id.btnRefresh);
@@ -185,7 +185,6 @@ public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.Down
 
             btnPage.setText("" + currentPage);
         }
-
         private Button btnPage;
     }
 }

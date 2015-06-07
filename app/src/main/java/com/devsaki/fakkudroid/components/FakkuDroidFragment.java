@@ -1,8 +1,7 @@
 package com.devsaki.fakkudroid.components;
 
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.SharedPreferences;
-import android.os.Build;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 
@@ -10,7 +9,7 @@ import com.devsaki.fakkudroid.database.FakkuDroidDB;
  * Created by neko on 06/06/2015.
  */
 
-public abstract class FakkuDroidFragment extends Fragment {
+public abstract class FakkuDroidFragment extends ListFragment {
 
     protected SharedPreferences getSharedPreferences(){
         return ((FakkuDroidActivity) getActivity()).getSharedPreferences();

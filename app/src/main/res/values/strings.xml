@@ -45,6 +45,9 @@
     <string name="title_activity_message_support">MessageSupportActivity</string>
 
 
+    <string name="downloads_manager_empty">Download queue is empty</string>
+    <string name="downloads_library_empty">Your downloads library is empty</string>
+    <string name="no_data">No data</string>
     <string name="crash_app">Send me the log by email, please.</string>
     <string name="close">Close</string>
 </resources>
