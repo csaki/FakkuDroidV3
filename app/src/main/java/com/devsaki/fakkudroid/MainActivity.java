@@ -7,8 +7,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -19,8 +17,6 @@ import android.widget.Toast;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
-import com.devsaki.fakkudroid.database.domains.ImageFile;
-import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.devsaki.fakkudroid.service.DownloadManagerService;
@@ -34,7 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -82,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
         fabDownloads.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainActivity = new Intent(MainActivity.this, ContentListActivity.class);
+                Intent mainActivity = new Intent(MainActivity.this, DownloadsActivity.class);
                 startActivity(mainActivity);
             }
         });
@@ -93,31 +88,6 @@ public class MainActivity extends ActionBarActivity {
                 webview.reload();
             }
         });
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, PreferencesActivity.class);
-            startActivity(intent);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void downloadContent() {

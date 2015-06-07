@@ -9,14 +9,13 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.devsaki.fakkudroid.ContentListActivity;
+import com.devsaki.fakkudroid.DownloadsActivity;
 import com.devsaki.fakkudroid.DownloadManagerActivity;
 import com.devsaki.fakkudroid.MainActivity;
 import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
 import com.devsaki.fakkudroid.database.domains.ImageFile;
-import com.devsaki.fakkudroid.database.enums.AttributeType;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.util.Constants;
 import com.devsaki.fakkudroid.util.Helper;
@@ -149,7 +148,6 @@ public class DownloadManagerService extends IntentService {
         boolean error = false;
         //Directory
         File dir = Helper.getDownloadDir(content.getFakkuId(), DownloadManagerService.this);
-
         try {
             //Download Cover Image
             Helper.saveInStorage(new File(dir, "thumb.jpg"), content.getCoverImageUrl());
@@ -234,7 +232,7 @@ public class DownloadManagerService extends IntentService {
         Intent resultIntent = null;
         if(content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR){
             resultIntent= new Intent(DownloadManagerService.this,
-                    ContentListActivity.class);
+                    DownloadsActivity.class);
         }else if(content.getStatus()==Status.DOWNLOADING||content.getStatus()==Status.PAUSED){
             resultIntent= new Intent(DownloadManagerService.this,
                     DownloadManagerActivity.class);

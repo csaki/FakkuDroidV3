@@ -1,6 +1,5 @@
 package com.devsaki.fakkudroid.components;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.devsaki.fakkudroid.ContentListActivity;
+import com.devsaki.fakkudroid.DownloadsActivity;
 import com.devsaki.fakkudroid.DownloadManagerActivity;
 import com.devsaki.fakkudroid.MainActivity;
 import com.devsaki.fakkudroid.PreferencesActivity;
@@ -109,7 +108,7 @@ public abstract class FakkuDroidActivity <T extends FakkuDroidFragment> extends 
     }
 
     public void ndDownloads(View view){
-        Intent intent = new Intent(this, ContentListActivity.class);
+        Intent intent = new Intent(this, DownloadsActivity.class);
         startActivity(intent);
     }
 

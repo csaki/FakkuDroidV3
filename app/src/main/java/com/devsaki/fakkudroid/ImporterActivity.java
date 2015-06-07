@@ -58,7 +58,7 @@ public class ImporterActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(List<Content> contents) {
             fakkuDroidDB.insertContents(contents.toArray(new Content[contents.size()]));
-            Intent intent = new Intent(ImporterActivity.this, ContentListActivity.class);
+            Intent intent = new Intent(ImporterActivity.this, DownloadsActivity.class);
             startActivity(intent);
             finish();
         }

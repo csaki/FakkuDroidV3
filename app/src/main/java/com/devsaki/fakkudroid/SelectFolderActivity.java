@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -102,7 +101,7 @@ public class SelectFolderActivity extends ActionBarActivity implements
                     })
                     .show();
         } else {
-            Intent intent = new Intent(this, ContentListActivity.class);
+            Intent intent = new Intent(this, DownloadsActivity.class);
             startActivity(intent);
             finish();
         }

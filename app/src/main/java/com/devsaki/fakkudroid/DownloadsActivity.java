@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.ContentListFragment> {
+public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.DownloadsFragment> {
 
-    private static final String TAG = ContentListActivity.class.getName();
+    private static final String TAG = DownloadsActivity.class.getName();
 
     @Override
-    protected ContentListFragment buildFragment() {
-        return new ContentListFragment();
+    protected DownloadsFragment buildFragment() {
+        return new DownloadsFragment();
     }
 
     @Override
@@ -94,13 +94,13 @@ public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.
         return super.onOptionsItemSelected(item);
     }
 
-    public static class ContentListFragment extends FakkuDroidFragment{
+    public static class DownloadsFragment extends FakkuDroidFragment{
         private static String query = "";
         private int currentPage = 1;
         private List<Content> contents;
 
         public void setQuery(String query) {
-            ContentListFragment.query = query;
+            DownloadsFragment.query = query;
             currentPage = 1;
         }
 

@@ -95,8 +95,6 @@ public class DownloadManagerActivity extends FakkuDroidActivity<DownloadManagerA
             return super.onCreateView(inflater, container, savedInstanceState);
         }
 
-
-
         public void resume(Content content){
             content.setStatus(Status.DOWNLOADING);
             getDB().updateContentStatus(content);
