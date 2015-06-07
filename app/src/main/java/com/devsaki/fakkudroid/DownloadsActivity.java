@@ -142,7 +142,7 @@ public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.Down
                             currentPage--;
                             searchContent();
                         } else {
-                            Toast.makeText(getActivity(), R.string.not_limit_per_page, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.not_previus_page, Toast.LENGTH_SHORT).show();
                         }
                     }
                 }

@@ -49,13 +49,6 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         super(context, R.layout.row_download, contents);
         this.context = context;
         this.contents = contents;
-        // Get max available VM memory, exceeding this amount will throw an
-        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
-        // int in its constructor.
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-
-        // Use 1/8th of the available memory for this memory cache.
-        final int cacheSize = maxMemory / 8;
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
     }
 
@@ -188,6 +181,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
 
     private void viewContent(Content content) {
         Intent intent = new Intent(getContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(MainActivity.INTENT_URL, Constants.FAKKU_URL + content.getUrl());
 
         getContext().startActivity(intent);

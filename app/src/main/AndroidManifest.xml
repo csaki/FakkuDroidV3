@@ -15,7 +15,7 @@
         <activity
             android:name=".DownloadsActivity"
             android:label="@string/title_activity_content_list"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleTask" >
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -29,7 +29,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:launchMode="standard">
         </activity>
 
         <service
@@ -41,26 +42,27 @@
         <activity
             android:name=".DownloadManagerActivity"
             android:label="@string/title_activity_download_manager"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleTask" >
         </activity>
         <activity
             android:name=".SelectFolderActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
         </activity>
         <activity android:name="net.rdrei.android.dirchooser.DirectoryChooserActivity" />
         <activity
             android:name=".ImporterActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/title_activity_preferences"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleTask" >
         </activity>
         <activity
             android:name=".MessageSupportActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:label="@string/title_activity_message_support"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"  >
         </activity>

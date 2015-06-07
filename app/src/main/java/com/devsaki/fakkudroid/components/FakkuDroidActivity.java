@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.devsaki.fakkudroid.ContentListActivity;
 import com.devsaki.fakkudroid.DownloadsActivity;
 import com.devsaki.fakkudroid.DownloadManagerActivity;
 import com.devsaki.fakkudroid.MainActivity;
@@ -99,7 +100,13 @@ public abstract class FakkuDroidActivity <T extends FakkuDroidFragment> extends 
 
     public void ndWebView(View view){
         Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    public void ndHome(View view){
+        //Intent intent = new Intent(this, ContentListActivity.class);
+        //startActivity(intent);
     }
 
     public void ndPreferences(View view){
