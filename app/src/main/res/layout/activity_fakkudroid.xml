@@ -21,15 +21,33 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="navigationDrawerWebView"
+            android:onClick="ndWebView"
             android:text="@string/navigation_drawer_wev_view"
+            android:padding="10dp"
             android:background="@drawable/image_button"
             android:textColor="@android:color/white"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="navigationDrawerPreferences"
+            android:onClick="ndDownloads"
+            android:text="@string/navigation_drawer_downloads"
+            android:padding="10dp"
+            android:background="@drawable/image_button"
+            android:textColor="@android:color/white"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="ndDownloadManager"
+            android:text="@string/navigation_drawer_download_manager"
+            android:padding="10dp"
+            android:background="@drawable/image_button"
+            android:textColor="@android:color/white"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="ndPreferences"
             android:text="@string/navigation_drawer_preferences"
+            android:padding="10dp"
             android:background="@drawable/image_button"
             android:textColor="@android:color/white"/>
 

@@ -1,5 +1,8 @@
-package com.devsaki.fakkudroid;
+package com.devsaki.fakkudroid.components;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -10,16 +13,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.devsaki.fakkudroid.ContentListActivity;
+import com.devsaki.fakkudroid.DownloadManagerActivity;
+import com.devsaki.fakkudroid.MainActivity;
+import com.devsaki.fakkudroid.PreferencesActivity;
+import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 
 /**
  * Created by DevSaki on 04/06/2015.
  */
-public abstract class FakkuDroidActivity extends ActionBarActivity {
+public abstract class FakkuDroidActivity <T extends FakkuDroidFragment> extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    protected FakkuDroidDB db;
-    protected SharedPreferences sharedPreferences;
+    private FakkuDroidDB db;
+    private SharedPreferences sharedPreferences;
+    private T fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +61,16 @@ public abstract class FakkuDroidActivity extends ActionBarActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         db = new FakkuDroidDB(this);
+
+        fragment = buildFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+    }
+
+    protected abstract T buildFragment();
+
+    public T getFragment() {
+        return fragment;
     }
 
     @Override
@@ -79,11 +98,31 @@ public abstract class FakkuDroidActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void navigationDrawerWebView(View view){
-
+    public void ndWebView(View view){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
-    public void navigationDrawerPreferences(View view){
+    public void ndPreferences(View view){
+        Intent intent = new Intent(this, PreferencesActivity.class);
+        startActivity(intent);
+    }
 
+    public void ndDownloads(View view){
+        Intent intent = new Intent(this, ContentListActivity.class);
+        startActivity(intent);
+    }
+
+    public void ndDownloadManager(View view){
+        Intent intent = new Intent(this, DownloadManagerActivity.class);
+        startActivity(intent);
+    }
+
+    public FakkuDroidDB getDB() {
+        return db;
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return sharedPreferences;
     }
 }

@@ -11,6 +11,4 @@
         android:orderInCategory="98" app:showAsAction="never"/>
     <item android:id="@+id/action_order_by_date" android:title="@string/action_order_date"
         android:orderInCategory="99" app:showAsAction="never"/>
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never"/>
 </menu>

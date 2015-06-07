@@ -92,7 +92,7 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((DownloadManagerActivity) getContext()).cancel(content);
+                ((DownloadManagerActivity) getContext()).getFragment().cancel(content);
                 notifyDataSetChanged();
             }
         });
@@ -101,9 +101,9 @@ public class ContentDownloadManagerAdapter extends ArrayAdapter<Content> {
             @Override
             public void onClick(View v) {
                 if(content.getStatus()!=Status.DOWNLOADING){
-                    ((DownloadManagerActivity)getContext()).resume(content);
+                    ((DownloadManagerActivity)getContext()).getFragment().resume(content);
                 }else {
-                    ((DownloadManagerActivity)getContext()).pause(content);
+                    ((DownloadManagerActivity)getContext()).getFragment().pause(content);
                     notifyDataSetChanged();
                 }
             }

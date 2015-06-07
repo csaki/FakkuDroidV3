@@ -44,31 +44,12 @@
             android:scaleType="fitXY"
             android:layout_gravity="center"
             android:padding="3dp"/>
-        <ImageButton
-            android:id="@+id/btnDownloadManager"
-            android:layout_width="?android:attr/actionBarSize"
-            android:layout_height="?android:attr/actionBarSize"
-            android:src="@drawable/ic_action_storage"
-            android:background="@drawable/image_button"
-            android:scaleType="fitXY"
-            android:layout_gravity="center"
-            android:padding="3dp"/>
 
         <ImageButton
             android:id="@+id/btnRefresh"
             android:layout_width="?android:attr/actionBarSize"
             android:layout_height="?android:attr/actionBarSize"
             android:src="@drawable/ic_action_refresh"
-            android:background="@drawable/image_button"
-            android:scaleType="fitXY"
-            android:layout_gravity="center"
-            android:padding="3dp"/>
-
-        <ImageButton
-            android:id="@+id/btnBrowser"
-            android:layout_width="?android:attr/actionBarSize"
-            android:layout_height="?android:attr/actionBarSize"
-            android:src="@drawable/ic_action_web_site"
             android:background="@drawable/image_button"
             android:scaleType="fitXY"
             android:layout_gravity="center"
