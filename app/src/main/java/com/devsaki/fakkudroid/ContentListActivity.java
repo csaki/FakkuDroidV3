@@ -63,7 +63,7 @@ public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.
     }
 
     public static class ContentListFragment extends FakkuDroidFragment{
-        private static String url = "";
+        private static String url;
         private int currentPage = 1;
         private List<Content> contents;
 
@@ -104,8 +104,6 @@ public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.
         }
 
         private void loadContent() {
-
-
             btnPage.setText("" + currentPage);
         }
         private Button btnPage;
@@ -115,7 +113,7 @@ public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+            getFragment().showLoading();
         }
 
         @Override
@@ -125,9 +123,9 @@ public class ContentListActivity extends FakkuDroidActivity<ContentListActivity.
 
         @Override
         protected void onPostExecute(List<Content> contents) {
-            super.onPostExecute(contents);
             ContentAdapter adapter = new ContentAdapter(ContentListActivity.this, contents);
             getFragment().setListAdapter(adapter);
+            getFragment().hideLoading();
         }
     }
 }

@@ -105,8 +105,8 @@ public abstract class FakkuDroidActivity <T extends FakkuDroidFragment> extends 
     }
 
     public void ndHome(View view){
-        //Intent intent = new Intent(this, ContentListActivity.class);
-        //startActivity(intent);
+        Intent intent = new Intent(this, ContentListActivity.class);
+        startActivity(intent);
     }
 
     public void ndPreferences(View view){

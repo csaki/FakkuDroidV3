@@ -29,14 +29,6 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="ndHome"
-            android:text="@string/navigation_drawer_home"
-            android:padding="10dp"
-            android:background="@drawable/image_button"
-            android:textColor="@android:color/white"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:onClick="ndDownloads"
             android:text="@string/navigation_drawer_downloads"
             android:padding="10dp"

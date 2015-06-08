@@ -14,8 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -175,7 +173,7 @@ public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.Down
                 contents = new ArrayList<>();
             }
             if (query.isEmpty())
-                getActivity().setTitle(R.string.title_activity_content_list);
+                getActivity().setTitle(R.string.title_activity_downloads);
             else
                 getActivity().setTitle(getResources().getString(R.string.title_activity_search).replace("@search", query));
 
