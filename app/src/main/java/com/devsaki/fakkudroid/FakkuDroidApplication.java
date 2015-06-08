@@ -66,8 +66,10 @@ public class FakkuDroidApplication extends Application{
 
 
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            mMemoryCache.put(key, bitmap);
+        if(key!=null&&bitmap!=null){
+            if (getBitmapFromMemCache(key) == null) {
+                mMemoryCache.put(key, bitmap);
+            }
         }
     }
 
