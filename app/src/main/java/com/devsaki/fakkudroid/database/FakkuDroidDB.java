@@ -1,6 +1,5 @@
 package com.devsaki.fakkudroid.database;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -86,7 +85,10 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 statement.bindLong(indexColumn++, row.getUploadDate());
                 statement.bindLong(indexColumn++, row.getDownloadDate());
                 statement.bindLong(indexColumn++, row.getStatus().getCode());
-                statement.bindString(indexColumn++, row.getCoverImageUrl());
+                if(row.getCoverImageUrl()==null)
+                    statement.bindNull(indexColumn++);
+                else
+                    statement.bindString(indexColumn++, row.getCoverImageUrl());
                 statement.execute();
 
                 if (row.getImageFiles() != null)
@@ -193,7 +195,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         try {
 
-            db = this.getWritableDatabase();
+            db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
             // looping through all rows and adding to list
@@ -215,7 +217,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         try {
 
-            db = this.getWritableDatabase();
+            db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
 
             if (cursor.moveToFirst()) {
@@ -236,7 +238,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         SQLiteDatabase db = null;
         try {
 
-            db = this.getWritableDatabase();
+            db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery(ContentTable.SELECT_IN_DOWNLOAD_MANAGER, new String[]{Status.DOWNLOADING.getCode() + "", Status.PAUSED.getCode() + ""});
 
             if (cursor.moveToFirst()) {
@@ -368,11 +370,10 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             result = new ArrayList<>();
             do {
-                int indexColumn = 1;
                 Attribute item = new Attribute();
-                item.setUrl(cursor.getString(indexColumn++));
-                item.setName(cursor.getString(indexColumn++));
-                item.setType(AttributeType.searchByCode(cursor.getInt(indexColumn++)));
+                item.setUrl(cursor.getString(1));
+                item.setName(cursor.getString(2));
+                item.setType(AttributeType.searchByCode(cursor.getInt(3)));
                 result.add(item);
             } while (cursor.moveToNext());
         }
