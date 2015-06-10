@@ -1,5 +1,6 @@
 package com.devsaki.fakkudroid;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,10 +22,13 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class SelectFolderActivity extends ActionBarActivity implements
+public class SelectFolderActivity extends Activity implements
         DirectoryChooserFragment.OnFragmentInteractionListener {
 
     private DirectoryChooserFragment mDialog;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +37,9 @@ public class SelectFolderActivity extends ActionBarActivity implements
 
         mDialog = DirectoryChooserFragment.newInstance("DialogSample", null);
 
-        SharedPreferences prefs = PreferenceManager
+        prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
+        editor = prefs.edit();
         String settingDir = prefs.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
         if (!settingDir.isEmpty()) {
             EditText editText = (EditText) findViewById(R.id.etFolder);
@@ -70,13 +75,13 @@ public class SelectFolderActivity extends ActionBarActivity implements
             nomedia.createNewFile();
         } catch (IOException e) {
         }
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Constants.SETTINGS_FAKKUDROID_FOLDER, fakkuFolder);
-        editor.commit();
-
-        if (Helper.getDownloadDir("", this).listFiles().length > 0) {
+        boolean directorySaved = editor.commit();
+        if(!directorySaved){
+            Toast.makeText(this, R.string.error_creating_folder, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (file.listFiles()!=null&&file.listFiles().length > 0) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(R.string.app_name)

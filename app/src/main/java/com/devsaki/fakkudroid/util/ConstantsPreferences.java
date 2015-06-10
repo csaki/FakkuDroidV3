@@ -15,5 +15,5 @@ public abstract class ConstantsPreferences {
     public static final int PREF_ORDER_CONTENT_DEFAULT = 0;
     public static final int PREF_ORDER_CONTENT_ALPHABETIC = 0;
     public static final int PREF_ORDER_CONTENT_BY_DATE = 1;
-    public static final String SHOW_MESSAGE_SUPPORT = "show_message_support_v5";
+    public static final String SHOW_MESSAGE_SUPPORT = "show_message_support_v6";
 }

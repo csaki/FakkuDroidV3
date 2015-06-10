@@ -41,10 +41,13 @@ public class PreferencesActivity extends PreferenceActivity{
                             .getDefaultSharedPreferences(getActivity());
                     String settingDir = prefs.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
                     File nomedia = new File(settingDir, ".nomedia");
-                    try {
-                        nomedia.createNewFile();
-                    } catch (IOException e) {
-                    }
+                    if(!nomedia.exists())
+                        try {
+                            nomedia.createNewFile();
+                        } catch (IOException e) {
+                            Toast.makeText(getActivity(), R.string.error_creating_nomedia_file, Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
                     Toast.makeText(getActivity(), R.string.nomedia_file_created, Toast.LENGTH_SHORT).show();
                     return true;
                 }

@@ -19,4 +19,5 @@
     <string name="pref_add_no_media_file_summary">A .nomedia file is a blank file placed inside a folder. When the media scanner detects the .nomedia file, the media scanner does not scan that folder so the images in that folder don\'t appear in the Gallery app.</string>
 
     <string name="nomedia_file_created">.nomedia file created.</string>
+    <string name="nomedia_file_error">Error creating .nomedia file.</string>
 </resources>
