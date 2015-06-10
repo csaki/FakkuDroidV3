@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -26,6 +27,9 @@ import com.melnykov.fab.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.CookieHandler;
+import java.net.CookiePolicy;
+import java.net.HttpCookie;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -154,6 +158,26 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            try{
+                String cookies = CookieManager.getInstance().getCookie(url);
+                Log.i(TAG, "COOKIES ---- > " + cookies);
+                java.net.CookieManager cookieManager = new java.net.CookieManager();
+                cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+                CookieHandler.setDefault(cookieManager);
+                String[] cookiesArray = cookies.split(";");
+                for(String cookie: cookiesArray){
+                    String key = cookie.split("=")[0].trim();
+                    String value = cookie.split("=")[1].trim();
+                    HttpCookie httpCookie = new HttpCookie(key, value);
+                    httpCookie.setDomain("fakku.net");
+                    httpCookie.setPath("/");
+                    httpCookie.setVersion(0);
+                    cookieManager.getCookieStore().add(new URI("https://fakku.net/"), httpCookie);
+                }
+            }catch (Exception ex){
+                Log.e(TAG, "trying to get the cookies", ex);
+            }
+
             URI uri = null;
             try {
                 uri = new URI(url);
@@ -161,7 +185,7 @@ public class MainActivity extends ActionBarActivity {
                 Log.e(TAG, "Error reading current url form webview", e);
             }
 
-            if (uri!=null) {
+            if (uri!=null&&uri.getPath()!=null) {
                 String[] paths = uri.getPath().split("/");
                 if(paths.length>=3){
                     if(paths[1].equals("doujinshi")||paths[1].equals("manga")){

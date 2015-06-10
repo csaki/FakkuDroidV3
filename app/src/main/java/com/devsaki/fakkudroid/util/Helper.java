@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,6 +24,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -179,8 +183,15 @@ public class Helper {
 
                 URL url = new URL(imageUrl);
 
-                URLConnection connection = url.openConnection();
+                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+                if(cookieManager.getCookieStore().getCookies().size() > 0)
+                {
+                    connection.setRequestProperty("Cookie",
+                            TextUtils.join(",", cookieManager.getCookieStore().getCookies()));
+                }
                 connection.setDoInput(true);
+
                 connection.connect();
 
                 input = new BufferedInputStream(url.openStream(), BUFFER_SIZE);

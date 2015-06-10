@@ -1,11 +1,15 @@
 package com.devsaki.fakkudroid.util;
 
+import android.text.TextUtils;
+
 import com.devsaki.fakkudroid.exceptions.HttpClientException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -15,9 +19,16 @@ import java.net.URL;
 public class HttpClientHelper {
 
     public static String call(URL url) throws HttpClientException, IOException {
+        CookieManager cookieManager = (CookieManager)CookieHandler.getDefault();
+
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.setConnectTimeout(10000);
+        if(cookieManager.getCookieStore().getCookies().size() > 0)
+        {
+            urlConnection.setRequestProperty("Cookie",
+                    TextUtils.join("; ", cookieManager.getCookieStore().getCookies()));
+        }
         urlConnection.connect();
 
         int code = urlConnection.getResponseCode();

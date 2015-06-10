@@ -74,63 +74,64 @@ public class DownloadManagerService extends IntentService {
             return;
         }
 
-        if(content.getImageFiles()==null||content.getImageFiles().size()!=content.getQtyPages()){
-            content.setImageFiles(new ArrayList<ImageFile>());
+        content.setImageFiles(new ArrayList<ImageFile>());
+        try {
+            ContentConteinerDto conteinerDto = FakkuClient.callContent(content.getCategory(), content.getFakkuId());
+
+            for (PageDto pageDto : conteinerDto.getPagesDto()){
+                ImageFile imageFile = new ImageFile();
+                imageFile.setStatus(Status.SAVED);
+                imageFile.setOrder(pageDto.getPage());
+                imageFile.setUrl(pageDto.getPageContent().getImage());
+                imageFile.setName(pageDto.getPageContent().getImage().substring(pageDto.getPageContent().getImage().lastIndexOf("/")));
+
+                content.getImageFiles().add(imageFile);
+            }
+        }catch (Exception ex){
+            Log.e(TAG, "Error loading images form api", ex);
             try {
-                ContentConteinerDto conteinerDto = FakkuClient.callContent(content.getCategory(), content.getFakkuId());
+                URL url = new URL(Constants.FAKKU_URL + content.getUrl() + Constants.FAKKU_READ);
+                String site = null;
+                String extention = null;
+                String html = HttpClientHelper.call(url);
 
-                for (PageDto pageDto : conteinerDto.getPagesDto()){
+                String find = "imgpath(x)";
+                int indexImgpath = html.indexOf(find) + find.length();
+                if(indexImgpath==find.length()-1){
+                    throw new RuntimeException("Not find image url.");
+                }
+                find = "return '";
+                int indexReturn = html.indexOf(find, indexImgpath) + find.length();
+                find = "'";
+                int indexFinishSite = html.indexOf(find, indexReturn);
+                site = html.substring(indexReturn, indexFinishSite);
+                if(site.startsWith("//")){
+                    site = "https:" + site;
+                }
+                int indexStartExtension = html.indexOf(find, indexFinishSite + find.length()) + find.length();
+                int indexFinishExtension = html.indexOf(find, indexStartExtension);
+                extention = html.substring(indexStartExtension, indexFinishExtension);
+                for (int i = 1; i <= content.getQtyPages(); i++) {
+                    String name = String.format("%03d", i) + extention;
                     ImageFile imageFile = new ImageFile();
+                    imageFile.setUrl(site + name);
+                    imageFile.setOrder(i);
                     imageFile.setStatus(Status.SAVED);
-                    imageFile.setOrder(pageDto.getPage());
-                    imageFile.setUrl(pageDto.getPageContent().getImage());
-                    imageFile.setName(pageDto.getPageContent().getImage().substring(pageDto.getPageContent().getImage().lastIndexOf("/")));
-
+                    imageFile.setName(name);
                     content.getImageFiles().add(imageFile);
                 }
-            }catch (Exception ex){
-                Log.e(TAG, "Error loading images form api", ex);
-                try {
-                    URL url = new URL(Constants.FAKKU_URL + content.getUrl() + Constants.FAKKU_READ);
-                    String site = null;
-                    String extention = null;
-                    String html = HttpClientHelper.call(url);
 
-                    String find = "imgpath(x)";
-                    int indexImgpath = html.indexOf(find) + find.length();
-                    find = "return '";
-                    int indexReturn = html.indexOf(find, indexImgpath) + find.length();
-                    find = "'";
-                    int indexFinishSite = html.indexOf(find, indexReturn);
-                    site = html.substring(indexReturn, indexFinishSite);
-                    if(site.startsWith("//")){
-                        site = "https:" + site;
-                    }
-                    int indexStartExtension = html.indexOf(find, indexFinishSite + find.length()) + find.length();
-                    int indexFinishExtension = html.indexOf(find, indexStartExtension);
-                    extention = html.substring(indexStartExtension, indexFinishExtension);
-                    for (int i = 1; i <= content.getQtyPages(); i++) {
-                        String name = String.format("%03d", i) + extention;
-                        ImageFile imageFile = new ImageFile();
-                        imageFile.setUrl(site + name);
-                        imageFile.setOrder(i);
-                        imageFile.setStatus(Status.SAVED);
-                        imageFile.setName(name);
-                        content.getImageFiles().add(imageFile);
-                    }
-
-                } catch (Exception e) {
-                    Log.e(TAG, "Guessing extension");
-                    String urlCdn = "https://" + content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/")) + "/images/";
-                    for (int i = 1; i <= content.getQtyPages(); i++) {
-                        String name = String.format("%03d", i) + ".jpg";
-                        ImageFile imageFile = new ImageFile();
-                        imageFile.setUrl(urlCdn + name);
-                        imageFile.setOrder(i);
-                        imageFile.setStatus(Status.SAVED);
-                        imageFile.setName(name);
-                        content.getImageFiles().add(imageFile);
-                    }
+            } catch (Exception e) {
+                Log.e(TAG, "Guessing extension");
+                String urlCdn = content.getCoverImageUrl().substring(2, content.getCoverImageUrl().lastIndexOf("/thumbs/")) + "/images/";
+                for (int i = 1; i <= content.getQtyPages(); i++) {
+                    String name = String.format("%03d", i) + ".jpg";
+                    ImageFile imageFile = new ImageFile();
+                    imageFile.setUrl(urlCdn + name);
+                    imageFile.setOrder(i);
+                    imageFile.setStatus(Status.SAVED);
+                    imageFile.setName(name);
+                    content.getImageFiles().add(imageFile);
                 }
             }
             db.insertImageFiles(content);
