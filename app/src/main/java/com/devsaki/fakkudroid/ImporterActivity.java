@@ -77,6 +77,7 @@ public class ImporterActivity extends ActionBarActivity {
             int processeds = 0;
             if(files.length>0){
                 contents = new ArrayList<>();
+                Date importedDate = new Date();
                 for(File file : files){
                     processeds++;
                     currentPercent = (int) (processeds*100.0/files.length);
@@ -122,7 +123,7 @@ public class ImporterActivity extends ActionBarActivity {
                                     content.setLanguage(from(doujinBean.getLanguage(), AttributeType.LANGUAGE));
 
                                     content.setStatus(com.devsaki.fakkudroid.database.enums.Status.MIGRATED);
-                                    content.setDownloadDate(new Date().getTime());
+                                    content.setDownloadDate(importedDate.getTime());
                                     contents.add(content);
                                 } catch (IOException e) {
                                     Log.e(TAG, "Reading json file v2", e);

@@ -71,9 +71,18 @@ public class SelectFolderActivity extends Activity implements
             }
         }
         File nomedia = new File(fakkuFolder, ".nomedia");
+        boolean hasPermission = false;
         try {
-            nomedia.createNewFile();
+            if(nomedia.exists()){
+                nomedia.delete();
+            }
+            hasPermission = nomedia.createNewFile();
         } catch (IOException e) {
+            hasPermission = false;
+        }
+        if(!hasPermission){
+            Toast.makeText(this, R.string.error_write_permission, Toast.LENGTH_SHORT).show();
+            return;
         }
         editor.putString(Constants.SETTINGS_FAKKUDROID_FOLDER, fakkuFolder);
         boolean directorySaved = editor.commit();
@@ -81,7 +90,7 @@ public class SelectFolderActivity extends Activity implements
             Toast.makeText(this, R.string.error_creating_folder, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (file.listFiles()!=null&&file.listFiles().length > 0) {
+        if (Helper.getDownloadDir("", this).listFiles()!=null&&Helper.getDownloadDir("", this).listFiles().length > 0) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(R.string.app_name)

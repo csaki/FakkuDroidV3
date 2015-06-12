@@ -8,13 +8,13 @@ android {
         applicationId "com.devsaki.fakkudroid"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 8
-        versionName "3.0.7"
+        versionCode 10
+        versionName "3.0.9"
     }
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+            proguardFiles 'proguard-rules.pro'
         }
     }
 }

@@ -92,7 +92,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         if (content.getTags() != null)
             for (int i = 0; i < content.getTags().size(); i++) {
                 Attribute attribute = content.getTags().get(i);
-                if(attribute.getName()==null){
+                if(attribute.getName()!=null){
                     tags += templateTvTags.replace("@tag@", attribute.getName());
                     if (i != content.getTags().size() - 1) {
                         tags += ", ";

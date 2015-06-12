@@ -78,13 +78,16 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                 statement.bindString(2, row.getFakkuId());
                 statement.bindString(3, row.getCategory());
                 statement.bindString(4, row.getUrl());
-                statement.bindString(5, row.getHtmlDescription());
+                if (row.getHtmlDescription() == null)
+                    statement.bindNull(5);
+                else
+                    statement.bindString(5, row.getHtmlDescription());
                 statement.bindString(6, row.getTitle());
                 statement.bindLong(7, row.getQtyPages());
                 statement.bindLong(8, row.getUploadDate());
                 statement.bindLong(9, row.getDownloadDate());
                 statement.bindLong(10, row.getStatus().getCode());
-                if(row.getCoverImageUrl()==null)
+                if (row.getCoverImageUrl() == null)
                     statement.bindNull(11);
                 else
                     statement.bindString(11, row.getCoverImageUrl());
@@ -189,16 +192,20 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         Log.i(TAG, "selectContentById");
         Content result = null;
         SQLiteDatabase db = null;
+        Cursor cursor = null;
         try {
 
             db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+            cursor = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
                 result = populateContent(cursor, db);
             }
         } finally {
+            if(cursor!=null){
+                cursor.close();
+            }
             Log.i(TAG, "selectContentById - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
@@ -265,15 +272,15 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             query = "%" + query + "%";
             db = this.getWritableDatabase();
             String sql = ContentTable.SELECT_DOWNLOADS;
-            if(orderAlphabetic){
+            if (orderAlphabetic) {
                 sql += ContentTable.ORDER_ALPHABETIC;
-            }else{
+            } else {
                 sql += ContentTable.ORDER_BY_DATE;
             }
             Cursor cursor = null;
-            if(qty<0){
+            if (qty < 0) {
                 cursor = db.rawQuery(sql, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + ""});
-            }else{
+            } else {
                 cursor = db.rawQuery(sql + ContentTable.LIMIT_BY_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
             }
 
@@ -308,50 +315,57 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
         //populate attributes
         List<Attribute> attributes = selectAttributesByContentId(db, content.getId());
-        if(attributes!=null)
-        for (Attribute attribute : attributes) {
-            if (attribute.getType() == AttributeType.ARTIST) {
-                if (content.getArtists() == null)
-                    content.setArtists(new ArrayList<Attribute>());
-                content.getArtists().add(attribute);
-            } else if (attribute.getType() == AttributeType.SERIE) {
-                content.setSerie(attribute);
-            } else if (attribute.getType() == AttributeType.PUBLISHER) {
-                if (content.getPublishers() == null)
-                    content.setPublishers(new ArrayList<Attribute>());
-                content.getPublishers().add(attribute);
-            } else if (attribute.getType() == AttributeType.UPLOADER) {
-                content.setUser(attribute);
-            } else if (attribute.getType() == AttributeType.LANGUAGE) {
-                content.setLanguage(attribute);
-            } else if (attribute.getType() == AttributeType.TAG) {
-                if (content.getTags() == null)
-                    content.setTags(new ArrayList<Attribute>());
-                content.getTags().add(attribute);
-            } else if (attribute.getType() == AttributeType.TRANSLATOR) {
-                if (content.getTranslators() == null)
-                    content.setTranslators(new ArrayList<Attribute>());
-                content.getTranslators().add(attribute);
+        if (attributes != null)
+            for (Attribute attribute : attributes) {
+                if (attribute.getType() == AttributeType.ARTIST) {
+                    if (content.getArtists() == null)
+                        content.setArtists(new ArrayList<Attribute>());
+                    content.getArtists().add(attribute);
+                } else if (attribute.getType() == AttributeType.SERIE) {
+                    content.setSerie(attribute);
+                } else if (attribute.getType() == AttributeType.PUBLISHER) {
+                    if (content.getPublishers() == null)
+                        content.setPublishers(new ArrayList<Attribute>());
+                    content.getPublishers().add(attribute);
+                } else if (attribute.getType() == AttributeType.UPLOADER) {
+                    content.setUser(attribute);
+                } else if (attribute.getType() == AttributeType.LANGUAGE) {
+                    content.setLanguage(attribute);
+                } else if (attribute.getType() == AttributeType.TAG) {
+                    if (content.getTags() == null)
+                        content.setTags(new ArrayList<Attribute>());
+                    content.getTags().add(attribute);
+                } else if (attribute.getType() == AttributeType.TRANSLATOR) {
+                    if (content.getTranslators() == null)
+                        content.setTranslators(new ArrayList<Attribute>());
+                    content.getTranslators().add(attribute);
+                }
             }
-        }
         return content;
     }
 
     private List<ImageFile> selectImageFilesByContentId(SQLiteDatabase db, int id) {
         List<ImageFile> result = null;
-        Cursor cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            result = new ArrayList<>();
-            do {
-                ImageFile item = new ImageFile();
-                item.setOrder(cursor.getInt(2));
-                item.setStatus(Status.searchByCode(cursor.getInt(3)));
-                item.setUrl(cursor.getString(4));
-                item.setName(cursor.getString(5));
-                result.add(item);
-            } while (cursor.moveToNext());
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                result = new ArrayList<>();
+                do {
+                    ImageFile item = new ImageFile();
+                    item.setOrder(cursor.getInt(2));
+                    item.setStatus(Status.searchByCode(cursor.getInt(3)));
+                    item.setUrl(cursor.getString(4));
+                    item.setName(cursor.getString(5));
+                    result.add(item);
+                } while (cursor.moveToNext());
+            }
+        }finally {
+            if(cursor!=null){
+                cursor.close();
+            }
         }
 
         return result;
@@ -359,19 +373,27 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
     private List<Attribute> selectAttributesByContentId(SQLiteDatabase db, int id) {
         List<Attribute> result = null;
-        Cursor cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            result = new ArrayList<>();
-            do {
-                Attribute item = new Attribute();
-                item.setUrl(cursor.getString(1));
-                item.setName(cursor.getString(2));
-                item.setType(AttributeType.searchByCode(cursor.getInt(3)));
-                result.add(item);
-            } while (cursor.moveToNext());
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                result = new ArrayList<>();
+                do {
+                    Attribute item = new Attribute();
+                    item.setUrl(cursor.getString(1));
+                    item.setName(cursor.getString(2));
+                    item.setType(AttributeType.searchByCode(cursor.getInt(3)));
+                    result.add(item);
+                } while (cursor.moveToNext());
+            }
+        }finally {
+            if(cursor!=null){
+                cursor.close();
+            }
         }
+
         return result;
     }
 
