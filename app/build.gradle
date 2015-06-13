@@ -8,8 +8,8 @@ android {
         applicationId "com.devsaki.fakkudroid"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 10
-        versionName "3.0.9"
+        versionCode 12
+        versionName "3.0.11"
     }
     buildTypes {
         release {

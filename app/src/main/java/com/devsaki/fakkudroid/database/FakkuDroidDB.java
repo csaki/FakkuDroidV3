@@ -192,19 +192,19 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         Log.i(TAG, "selectContentById");
         Content result = null;
         SQLiteDatabase db = null;
-        Cursor cursor = null;
+        Cursor cursorContents = null;
         try {
 
             db = this.getReadableDatabase();
-            cursor = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+            cursorContents = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
             // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
-                result = populateContent(cursor, db);
+            if (cursorContents.moveToFirst()) {
+                result = populateContent(cursorContents, db);
             }
         } finally {
-            if(cursor!=null){
-                cursor.close();
+            if(cursorContents!=null){
+                cursorContents.close();
             }
             Log.i(TAG, "selectContentById - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
@@ -218,15 +218,19 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         Log.i(TAG, "selectContentByStatus");
         Content result = null;
         SQLiteDatabase db = null;
+        Cursor cursorContent = null;
         try {
 
             db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
+            cursorContent = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
 
-            if (cursor.moveToFirst()) {
-                result = populateContent(cursor, db);
+            if (cursorContent.moveToFirst()) {
+                result = populateContent(cursorContent, db);
             }
         } finally {
+            if(cursorContent!=null){
+                cursorContent.close();
+            }
             Log.i(TAG, "selectContentByStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
@@ -239,18 +243,22 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         Log.i(TAG, "selectContentInDownloadManager");
         List<Content> result = null;
         SQLiteDatabase db = null;
+        Cursor cursorContent = null;
         try {
 
             db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(ContentTable.SELECT_IN_DOWNLOAD_MANAGER, new String[]{Status.DOWNLOADING.getCode() + "", Status.PAUSED.getCode() + ""});
+            cursorContent = db.rawQuery(ContentTable.SELECT_IN_DOWNLOAD_MANAGER, new String[]{Status.DOWNLOADING.getCode() + "", Status.PAUSED.getCode() + ""});
 
-            if (cursor.moveToFirst()) {
+            if (cursorContent.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
-                    result.add(populateContent(cursor, db));
-                } while (cursor.moveToNext());
+                    result.add(populateContent(cursorContent, db));
+                } while (cursorContent.moveToNext());
             }
         } finally {
+            if(cursorContent!=null){
+                cursorContent.close();
+            }
             Log.i(TAG, "selectContentInDownloadManager - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
@@ -267,6 +275,7 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         Log.i(TAG, "selectContentByQuery");
         List<Content> result = null;
         SQLiteDatabase db = null;
+        Cursor cursorContent = null;
         int start = (page - 1) * qty;
         try {
             query = "%" + query + "%";
@@ -277,21 +286,23 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
             } else {
                 sql += ContentTable.ORDER_BY_DATE;
             }
-            Cursor cursor = null;
             if (qty < 0) {
-                cursor = db.rawQuery(sql, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + ""});
+                cursorContent = db.rawQuery(sql, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + ""});
             } else {
-                cursor = db.rawQuery(sql + ContentTable.LIMIT_BY_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
+                cursorContent = db.rawQuery(sql + ContentTable.LIMIT_BY_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
             }
 
 
-            if (cursor.moveToFirst()) {
+            if (cursorContent.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
-                    result.add(populateContent(cursor, db));
-                } while (cursor.moveToNext());
+                    result.add(populateContent(cursorContent, db));
+                } while (cursorContent.moveToNext());
             }
         } finally {
+            if(cursorContent!=null){
+                cursorContent.close();
+            }
             Log.i(TAG, "selectContentByQuery - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
             if (db != null && db.isOpen())
                 db.close(); // Closing database connection
@@ -300,16 +311,16 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
         return result;
     }
 
-    private Content populateContent(Cursor cursor, SQLiteDatabase db) {
+    private Content populateContent(Cursor cursorContent, SQLiteDatabase db) {
         Content content = new Content();
-        content.setUrl(cursor.getString(3));
-        content.setTitle(cursor.getString(4));
-        content.setHtmlDescription(cursor.getString(5));
-        content.setQtyPages(cursor.getInt(6));
-        content.setUploadDate(cursor.getLong(7));
-        content.setDownloadDate(cursor.getLong(8));
-        content.setStatus(Status.searchByCode(cursor.getInt(9)));
-        content.setCoverImageUrl(cursor.getString(10));
+        content.setUrl(cursorContent.getString(3));
+        content.setTitle(cursorContent.getString(4));
+        content.setHtmlDescription(cursorContent.getString(5));
+        content.setQtyPages(cursorContent.getInt(6));
+        content.setUploadDate(cursorContent.getLong(7));
+        content.setDownloadDate(cursorContent.getLong(8));
+        content.setStatus(Status.searchByCode(cursorContent.getInt(9)));
+        content.setCoverImageUrl(cursorContent.getString(10));
 
         content.setImageFiles(selectImageFilesByContentId(db, content.getId()));
 
@@ -346,25 +357,25 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
     private List<ImageFile> selectImageFilesByContentId(SQLiteDatabase db, int id) {
         List<ImageFile> result = null;
-        Cursor cursor = null;
+        Cursor cursorImageFiles = null;
         try {
-            cursor = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+            cursorImageFiles = db.rawQuery(ImageFileTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
             // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
+            if (cursorImageFiles.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
                     ImageFile item = new ImageFile();
-                    item.setOrder(cursor.getInt(2));
-                    item.setStatus(Status.searchByCode(cursor.getInt(3)));
-                    item.setUrl(cursor.getString(4));
-                    item.setName(cursor.getString(5));
+                    item.setOrder(cursorImageFiles.getInt(2));
+                    item.setStatus(Status.searchByCode(cursorImageFiles.getInt(3)));
+                    item.setUrl(cursorImageFiles.getString(4));
+                    item.setName(cursorImageFiles.getString(5));
                     result.add(item);
-                } while (cursor.moveToNext());
+                } while (cursorImageFiles.moveToNext());
             }
         }finally {
-            if(cursor!=null){
-                cursor.close();
+            if(cursorImageFiles!=null){
+                cursorImageFiles.close();
             }
         }
 
@@ -373,24 +384,24 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
 
     private List<Attribute> selectAttributesByContentId(SQLiteDatabase db, int id) {
         List<Attribute> result = null;
-        Cursor cursor = null;
+        Cursor cursorAttributes = null;
         try {
-            cursor = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+            cursorAttributes = db.rawQuery(AttributeTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
             // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
+            if (cursorAttributes.moveToFirst()) {
                 result = new ArrayList<>();
                 do {
                     Attribute item = new Attribute();
-                    item.setUrl(cursor.getString(1));
-                    item.setName(cursor.getString(2));
-                    item.setType(AttributeType.searchByCode(cursor.getInt(3)));
+                    item.setUrl(cursorAttributes.getString(1));
+                    item.setName(cursorAttributes.getString(2));
+                    item.setType(AttributeType.searchByCode(cursorAttributes.getInt(3)));
                     result.add(item);
-                } while (cursor.moveToNext());
+                } while (cursorAttributes.moveToNext());
             }
         }finally {
-            if(cursor!=null){
-                cursor.close();
+            if(cursorAttributes!=null){
+                cursorAttributes.close();
             }
         }
 
