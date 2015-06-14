@@ -161,10 +161,13 @@ public class MainActivity extends ActionBarActivity {
             try{
                 String cookies = CookieManager.getInstance().getCookie(url);
                 Log.i(TAG, "COOKIES ---- > " + cookies);
-                java.net.CookieManager cookieManager = new java.net.CookieManager();
+                java.net.CookieManager cookieManager = (java.net.CookieManager)CookieHandler.getDefault();
+                if(cookieManager==null)
+                    cookieManager = new java.net.CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 CookieHandler.setDefault(cookieManager);
                 String[] cookiesArray = cookies.split(";");
+                URI fakkuCookie = new URI("https://fakku.net/");
                 for(String cookie: cookiesArray){
                     String key = cookie.split("=")[0].trim();
                     String value = cookie.split("=")[1].trim();
@@ -172,7 +175,8 @@ public class MainActivity extends ActionBarActivity {
                     httpCookie.setDomain("fakku.net");
                     httpCookie.setPath("/");
                     httpCookie.setVersion(0);
-                    cookieManager.getCookieStore().add(new URI("https://fakku.net/"), httpCookie);
+                    cookieManager.getCookieStore().removeAll();
+                    cookieManager.getCookieStore().add(fakkuCookie, httpCookie);
                 }
             }catch (Exception ex){
                 Log.e(TAG, "trying to get the cookies", ex);

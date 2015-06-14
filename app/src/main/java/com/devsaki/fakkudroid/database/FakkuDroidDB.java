@@ -268,8 +268,6 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public List<Content> selectContentByQuery(String query, int page, int qty, boolean orderAlphabetic) {
-        if(true)
-            throw new RuntimeException();
         Log.i(TAG, "selectContentByQuery");
         List<Content> result = null;
         SQLiteDatabase db = null;

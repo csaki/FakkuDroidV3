@@ -51,4 +51,6 @@
     <string name="no_data">No data</string>
     <string name="crash_app">Crash report log was sent.</string>
     <string name="close">Close</string>
+    <string name="new_version_available">A new version is available</string>
+    <string name="version_number">Your version is @oldVersion and the new one is @newVersion</string>
 </resources>
