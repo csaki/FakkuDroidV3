@@ -18,14 +18,18 @@ import com.devsaki.fakkudroid.util.ImageQuality;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+import org.acra.sender.HttpSender;
 
 import java.io.File;
 
 /**
  * Created by DevSaki on 20/05/2015.
  */
-@ReportsCrashes(formUri = "",
-        mailTo = "devsaki.br@gmail.com",
+@ReportsCrashes(formUri = "http://devsaki.me:5984/acra-fakkudroid/_design/acra-storage/_update/report",
+        httpMethod = HttpSender.Method.PUT,
+        reportType = HttpSender.Type.JSON,
+        formUriBasicAuthLogin = "reportuser",
+        formUriBasicAuthPassword = "\\~hRcq#o?UVtT!7G",
         mode = ReportingInteractionMode.TOAST,
         resToastText = R.string.crash_app)
 public class FakkuDroidApplication extends Application{
