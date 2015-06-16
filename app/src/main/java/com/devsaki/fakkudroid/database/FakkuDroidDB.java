@@ -19,13 +19,16 @@ import com.devsaki.fakkudroid.database.enums.Status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by DevSaki on 10/05/2015.
  */
 public class FakkuDroidDB extends SQLiteOpenHelper {
 
+    private static FakkuDroidDB instance;
     private static final String TAG = FakkuDroidDB.class.getName();
+    private static final Object locker = new Object();
 
     // All Static variables
     // Database Version
@@ -63,94 +66,98 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void insertContents(Content[] rows) {
-        Log.i(TAG, "insertContents");
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(Content.INSERT_STATEMENT);
-            db.beginTransaction();
-            for (Content row : rows) {
+        synchronized (locker) {
+            Log.i(TAG, "insertContents");
+            SQLiteDatabase db = null;
+            try {
+                db = this.getWritableDatabase();
+                SQLiteStatement statement = db.compileStatement(Content.INSERT_STATEMENT);
+                db.beginTransaction();
+                for (Content row : rows) {
 
-                deleteContent(db, row);
+                    deleteContent(db, row);
 
-                statement.clearBindings();
-                statement.bindLong(1, row.getId());
-                statement.bindString(2, row.getFakkuId());
-                statement.bindString(3, row.getCategory());
-                statement.bindString(4, row.getUrl());
-                if (row.getHtmlDescription() == null)
-                    statement.bindNull(5);
-                else
-                    statement.bindString(5, row.getHtmlDescription());
-                statement.bindString(6, row.getTitle());
-                statement.bindLong(7, row.getQtyPages());
-                statement.bindLong(8, row.getUploadDate());
-                statement.bindLong(9, row.getDownloadDate());
-                statement.bindLong(10, row.getStatus().getCode());
-                if (row.getCoverImageUrl() == null)
-                    statement.bindNull(11);
-                else
-                    statement.bindString(11, row.getCoverImageUrl());
-                statement.execute();
+                    statement.clearBindings();
+                    statement.bindLong(1, row.getId());
+                    statement.bindString(2, row.getFakkuId());
+                    statement.bindString(3, row.getCategory());
+                    statement.bindString(4, row.getUrl());
+                    if (row.getHtmlDescription() == null)
+                        statement.bindNull(5);
+                    else
+                        statement.bindString(5, row.getHtmlDescription());
+                    statement.bindString(6, row.getTitle());
+                    statement.bindLong(7, row.getQtyPages());
+                    statement.bindLong(8, row.getUploadDate());
+                    statement.bindLong(9, row.getDownloadDate());
+                    statement.bindLong(10, row.getStatus().getCode());
+                    if (row.getCoverImageUrl() == null)
+                        statement.bindNull(11);
+                    else
+                        statement.bindString(11, row.getCoverImageUrl());
+                    statement.execute();
 
-                if (row.getImageFiles() != null)
-                    insertImageFiles(db, row);
+                    if (row.getImageFiles() != null)
+                        insertImageFiles(db, row);
 
-                List<Attribute> attributes = new ArrayList<>();
-                if (row.getSerie() != null)
-                    attributes.add(row.getSerie());
-                if (row.getArtists() != null)
-                    attributes.addAll(row.getArtists());
-                if (row.getPublishers() != null)
-                    attributes.addAll(row.getPublishers());
-                if (row.getLanguage() != null)
-                    attributes.add(row.getLanguage());
-                if (row.getTags() != null)
-                    attributes.addAll(row.getTags());
-                if (row.getTranslators() != null)
-                    attributes.addAll(row.getTranslators());
-                if (row.getUser() != null)
-                    attributes.add(row.getUser());
-                insertAttributes(db, row, attributes);
+                    List<Attribute> attributes = new ArrayList<>();
+                    if (row.getSerie() != null)
+                        attributes.add(row.getSerie());
+                    if (row.getArtists() != null)
+                        attributes.addAll(row.getArtists());
+                    if (row.getPublishers() != null)
+                        attributes.addAll(row.getPublishers());
+                    if (row.getLanguage() != null)
+                        attributes.add(row.getLanguage());
+                    if (row.getTags() != null)
+                        attributes.addAll(row.getTags());
+                    if (row.getTranslators() != null)
+                        attributes.addAll(row.getTranslators());
+                    if (row.getUser() != null)
+                        attributes.add(row.getUser());
+                    insertAttributes(db, row, attributes);
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+
+            } finally {
+                Log.i(TAG, "insertContents - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
             }
-            db.setTransactionSuccessful();
-            db.endTransaction();
-
-        } finally {
-            Log.i(TAG, "insertContents - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
         }
     }
 
     public void insertImageFiles(Content content) {
-        Log.i(TAG, "insertImageFiles");
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            db.beginTransaction();
-            SQLiteStatement statement = db.compileStatement(ImageFileTable.INSERT_STATEMENT);
-            SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
-            statementImages.clearBindings();
-            statementImages.bindLong(1, content.getId());
-            statementImages.execute();
-            for (ImageFile row : content.getImageFiles()) {
-                statement.clearBindings();
-                statement.bindLong(1, row.getId());
-                statement.bindLong(2, content.getId());
-                statement.bindLong(3, row.getOrder());
-                statement.bindString(4, row.getUrl());
-                statement.bindString(5, row.getName());
-                statement.bindLong(6, row.getStatus().getCode());
-                statement.execute();
-            }
-            db.setTransactionSuccessful();
-            db.endTransaction();
+        synchronized (locker) {
+            Log.i(TAG, "insertImageFiles");
+            SQLiteDatabase db = null;
+            try {
+                db = this.getWritableDatabase();
+                db.beginTransaction();
+                SQLiteStatement statement = db.compileStatement(ImageFileTable.INSERT_STATEMENT);
+                SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
+                statementImages.clearBindings();
+                statementImages.bindLong(1, content.getId());
+                statementImages.execute();
+                for (ImageFile row : content.getImageFiles()) {
+                    statement.clearBindings();
+                    statement.bindLong(1, row.getId());
+                    statement.bindLong(2, content.getId());
+                    statement.bindLong(3, row.getOrder());
+                    statement.bindString(4, row.getUrl());
+                    statement.bindString(5, row.getName());
+                    statement.bindLong(6, row.getStatus().getCode());
+                    statement.execute();
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
 
-        } finally {
-            Log.i(TAG, "insertImageFiles - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+            } finally {
+                Log.i(TAG, "insertImageFiles - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
+            }
         }
     }
 
@@ -189,119 +196,131 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public Content selectContentById(int id) {
-        Log.i(TAG, "selectContentById");
         Content result = null;
-        SQLiteDatabase db = null;
-        Cursor cursorContents = null;
-        try {
+        synchronized (locker){
+            Log.i(TAG, "selectContentById");
+            SQLiteDatabase db = null;
+            Cursor cursorContents = null;
+            try {
 
-            db = this.getReadableDatabase();
-            cursorContents = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
+                db = this.getReadableDatabase();
+                cursorContents = db.rawQuery(ContentTable.SELECT_BY_CONTENT_ID, new String[]{id + ""});
 
-            // looping through all rows and adding to list
-            if (cursorContents.moveToFirst()) {
-                result = populateContent(cursorContents, db);
+                // looping through all rows and adding to list
+                if (cursorContents.moveToFirst()) {
+                    result = populateContent(cursorContents, db);
+                }
+            } finally {
+                if(cursorContents!=null){
+                    cursorContents.close();
+                }
+                Log.i(TAG, "selectContentById - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
             }
-        } finally {
-            if(cursorContents!=null){
-                cursorContents.close();
-            }
-            Log.i(TAG, "selectContentById - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
         }
-
         return result;
     }
 
     public Content selectContentByStatus(Status status) {
-        Log.i(TAG, "selectContentByStatus");
         Content result = null;
-        SQLiteDatabase db = null;
-        Cursor cursorContent = null;
-        try {
 
-            db = this.getReadableDatabase();
-            cursorContent = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
+        synchronized (locker){
+            Log.i(TAG, "selectContentByStatus");
 
-            if (cursorContent.moveToFirst()) {
-                result = populateContent(cursorContent, db);
+            SQLiteDatabase db = null;
+            Cursor cursorContent = null;
+            try {
+
+                db = this.getReadableDatabase();
+                cursorContent = db.rawQuery(ContentTable.SELECT_BY_STATUS, new String[]{status.getCode() + ""});
+
+                if (cursorContent.moveToFirst()) {
+                    result = populateContent(cursorContent, db);
+                }
+            } finally {
+                if(cursorContent!=null){
+                    cursorContent.close();
+                }
+                Log.i(TAG, "selectContentByStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
             }
-        } finally {
-            if(cursorContent!=null){
-                cursorContent.close();
-            }
-            Log.i(TAG, "selectContentByStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
         }
+
 
         return result;
     }
 
     public List<Content> selectContentInDownloadManager() {
-        Log.i(TAG, "selectContentInDownloadManager");
         List<Content> result = null;
-        SQLiteDatabase db = null;
-        Cursor cursorContent = null;
-        try {
+        synchronized (locker){
+            Log.i(TAG, "selectContentInDownloadManager");
+            SQLiteDatabase db = null;
+            Cursor cursorContent = null;
+            try {
 
-            db = this.getReadableDatabase();
-            cursorContent = db.rawQuery(ContentTable.SELECT_IN_DOWNLOAD_MANAGER, new String[]{Status.DOWNLOADING.getCode() + "", Status.PAUSED.getCode() + ""});
+                db = this.getReadableDatabase();
+                cursorContent = db.rawQuery(ContentTable.SELECT_IN_DOWNLOAD_MANAGER, new String[]{Status.DOWNLOADING.getCode() + "", Status.PAUSED.getCode() + ""});
 
-            if (cursorContent.moveToFirst()) {
-                result = new ArrayList<>();
-                do {
-                    result.add(populateContent(cursorContent, db));
-                } while (cursorContent.moveToNext());
+                if (cursorContent.moveToFirst()) {
+                    result = new ArrayList<>();
+                    do {
+                        result.add(populateContent(cursorContent, db));
+                    } while (cursorContent.moveToNext());
+                }
+            } finally {
+                if(cursorContent!=null){
+                    cursorContent.close();
+                }
+                Log.i(TAG, "selectContentInDownloadManager - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
             }
-        } finally {
-            if(cursorContent!=null){
-                cursorContent.close();
-            }
-            Log.i(TAG, "selectContentInDownloadManager - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
         }
 
         return result;
     }
 
     public List<Content> selectContentByQuery(String query, int page, int qty, boolean orderAlphabetic) {
-        Log.i(TAG, "selectContentByQuery");
         List<Content> result = null;
-        SQLiteDatabase db = null;
-        Cursor cursorContent = null;
-        int start = (page - 1) * qty;
-        try {
-            query = "%" + query + "%";
-            db = this.getWritableDatabase();
-            String sql = ContentTable.SELECT_DOWNLOADS;
-            if (orderAlphabetic) {
-                sql += ContentTable.ORDER_ALPHABETIC;
-            } else {
-                sql += ContentTable.ORDER_BY_DATE;
-            }
-            if (qty < 0) {
-                cursorContent = db.rawQuery(sql, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + ""});
-            } else {
-                cursorContent = db.rawQuery(sql + ContentTable.LIMIT_BY_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
-            }
+
+        synchronized (locker){
+            Log.i(TAG, "selectContentByQuery");
+
+            SQLiteDatabase db = null;
+            Cursor cursorContent = null;
+            int start = (page - 1) * qty;
+            try {
+                query = "%" + query + "%";
+                db = this.getReadableDatabase();
+                String sql = ContentTable.SELECT_DOWNLOADS;
+                if (orderAlphabetic) {
+                    sql += ContentTable.ORDER_ALPHABETIC;
+                } else {
+                    sql += ContentTable.ORDER_BY_DATE;
+                }
+                if (qty < 0) {
+                    cursorContent = db.rawQuery(sql, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + ""});
+                } else {
+                    cursorContent = db.rawQuery(sql + ContentTable.LIMIT_BY_PAGE, new String[]{Status.DOWNLOADED.getCode() + "", Status.ERROR.getCode() + "", Status.MIGRATED.getCode() + "", query, query, AttributeType.ARTIST.getCode() + "", AttributeType.TAG.getCode() + "", AttributeType.SERIE.getCode() + "", start + "", qty + ""});
+                }
 
 
-            if (cursorContent.moveToFirst()) {
-                result = new ArrayList<>();
-                do {
-                    result.add(populateContent(cursorContent, db));
-                } while (cursorContent.moveToNext());
+                if (cursorContent.moveToFirst()) {
+                    result = new ArrayList<>();
+                    do {
+                        result.add(populateContent(cursorContent, db));
+                    } while (cursorContent.moveToNext());
+                }
+            } finally {
+                if(cursorContent!=null){
+                    cursorContent.close();
+                }
+                Log.i(TAG, "selectContentByQuery - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
             }
-        } finally {
-            if(cursorContent!=null){
-                cursorContent.close();
-            }
-            Log.i(TAG, "selectContentByQuery - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
         }
 
         return result;
@@ -405,22 +424,24 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void updateImageFileStatus(ImageFile row) {
-        Log.i(TAG, "updateImageFileStatus");
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(ImageFileTable.UPDATE_IMAGE_FILE_STATUS_STATEMENT);
-            db.beginTransaction();
-            statement.clearBindings();
-            statement.bindLong(1, row.getStatus().getCode());
-            statement.bindLong(2, row.getId());
-            statement.execute();
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        } finally {
-            Log.i(TAG, "updateImageFileStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+        synchronized (locker){
+            Log.i(TAG, "updateImageFileStatus");
+            SQLiteDatabase db = null;
+            try {
+                db = this.getWritableDatabase();
+                SQLiteStatement statement = db.compileStatement(ImageFileTable.UPDATE_IMAGE_FILE_STATUS_STATEMENT);
+                db.beginTransaction();
+                statement.clearBindings();
+                statement.bindLong(1, row.getStatus().getCode());
+                statement.bindLong(2, row.getId());
+                statement.execute();
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            } finally {
+                Log.i(TAG, "updateImageFileStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
+            }
         }
     }
 
@@ -440,70 +461,76 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
     }
 
     public void deleteContent(Content content) {
-        Log.i(TAG, "deleteContent");
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(ContentTable.DELETE_STATEMENT);
-            SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
-            SQLiteStatement statementAttributes = db.compileStatement(ContentAttributeTable.DELETE_STATEMENT);
-            db.beginTransaction();
-            statement.clearBindings();
-            statement.bindLong(1, content.getId());
-            statement.execute();
-            statementImages.clearBindings();
-            statementImages.bindLong(1, content.getId());
-            statementImages.execute();
-            statementAttributes.clearBindings();
-            statementAttributes.bindLong(1, content.getId());
-            statementAttributes.execute();
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        } finally {
-            Log.i(TAG, "deleteContent - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+        synchronized (locker){
+            Log.i(TAG, "deleteContent");
+            SQLiteDatabase db = null;
+            try {
+                db = this.getWritableDatabase();
+                SQLiteStatement statement = db.compileStatement(ContentTable.DELETE_STATEMENT);
+                SQLiteStatement statementImages = db.compileStatement(ImageFileTable.DELETE_STATEMENT);
+                SQLiteStatement statementAttributes = db.compileStatement(ContentAttributeTable.DELETE_STATEMENT);
+                db.beginTransaction();
+                statement.clearBindings();
+                statement.bindLong(1, content.getId());
+                statement.execute();
+                statementImages.clearBindings();
+                statementImages.bindLong(1, content.getId());
+                statementImages.execute();
+                statementAttributes.clearBindings();
+                statementAttributes.bindLong(1, content.getId());
+                statementAttributes.execute();
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            } finally {
+                Log.i(TAG, "deleteContent - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
+            }
         }
     }
 
     public void updateContentStatus(Content row) {
-        Log.i(TAG, "updateContentStatus");
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT);
-            db.beginTransaction();
-            statement.clearBindings();
-            statement.bindLong(1, row.getDownloadDate());
-            statement.bindLong(2, row.getStatus().getCode());
-            statement.bindLong(3, row.getId());
-            statement.execute();
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        } finally {
-            Log.i(TAG, "updateContentStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+        synchronized (locker){
+            Log.i(TAG, "updateContentStatus");
+            SQLiteDatabase db = null;
+            try {
+                db = this.getWritableDatabase();
+                SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_DOWNLOAD_DATE_STATUS_STATEMENT);
+                db.beginTransaction();
+                statement.clearBindings();
+                statement.bindLong(1, row.getDownloadDate());
+                statement.bindLong(2, row.getStatus().getCode());
+                statement.bindLong(3, row.getId());
+                statement.execute();
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            } finally {
+                Log.i(TAG, "updateContentStatus - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
+            }
         }
     }
 
     public void updateContentStatus(Status updateTo, Status updateFrom) {
-        Log.i(TAG, "updateContentStatus2");
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_STATUS_STATEMENT);
-            db.beginTransaction();
-            statement.clearBindings();
-            statement.bindLong(1, updateTo.getCode());
-            statement.bindLong(2, updateFrom.getCode());
-            statement.execute();
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        } finally {
-            Log.i(TAG, "updateContentStatus2 - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
-            if (db != null && db.isOpen())
-                db.close(); // Closing database connection
+        synchronized (locker){
+            Log.i(TAG, "updateContentStatus2");
+            SQLiteDatabase db = null;
+            try {
+                db = this.getWritableDatabase();
+                SQLiteStatement statement = db.compileStatement(ContentTable.UPDATE_CONTENT_STATUS_STATEMENT);
+                db.beginTransaction();
+                statement.clearBindings();
+                statement.bindLong(1, updateTo.getCode());
+                statement.bindLong(2, updateFrom.getCode());
+                statement.execute();
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            } finally {
+                Log.i(TAG, "updateContentStatus2 - trying to close the db connection. Condition : " + (db != null && db.isOpen()));
+                if (db != null && db.isOpen())
+                    db.close(); // Closing database connection
+            }
         }
     }
 }
