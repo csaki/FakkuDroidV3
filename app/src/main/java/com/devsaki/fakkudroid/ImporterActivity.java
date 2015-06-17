@@ -90,7 +90,7 @@ public class ImporterActivity extends ActionBarActivity {
                                 if(content.getStatus() != com.devsaki.fakkudroid.database.enums.Status.DOWNLOADED)
                                     content.setStatus(com.devsaki.fakkudroid.database.enums.Status.MIGRATED);
                                 contents.add(content);
-                            } catch (IOException e) {
+                            } catch (Exception e) {
                                 Log.e(TAG, "Reading json file", e);
                             }
                         }else{
@@ -125,7 +125,7 @@ public class ImporterActivity extends ActionBarActivity {
                                     content.setStatus(com.devsaki.fakkudroid.database.enums.Status.MIGRATED);
                                     content.setDownloadDate(importedDate.getTime());
                                     contents.add(content);
-                                } catch (IOException e) {
+                                } catch (Exception e) {
                                     Log.e(TAG, "Reading json file v2", e);
                                 }
                             }

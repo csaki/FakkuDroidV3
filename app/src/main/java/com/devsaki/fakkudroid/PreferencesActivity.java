@@ -8,6 +8,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.devsaki.fakkudroid.asynctasks.UpdateCheckerTask;
+import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.Constants;
 
 import java.io.File;
@@ -41,7 +43,7 @@ public class PreferencesActivity extends PreferenceActivity{
                             .getDefaultSharedPreferences(getActivity());
                     String settingDir = prefs.getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
                     File nomedia = new File(settingDir, ".nomedia");
-                    if(!nomedia.exists())
+                    if (!nomedia.exists())
                         try {
                             nomedia.createNewFile();
                         } catch (IOException e) {
@@ -49,6 +51,16 @@ public class PreferencesActivity extends PreferenceActivity{
                             return true;
                         }
                     Toast.makeText(getActivity(), R.string.nomedia_file_created, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+
+            Preference checkUpdates = (Preference) getPreferenceScreen().findPreference("pref_check_updates_now");
+            checkUpdates.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    AndroidHelper.executeAsyncTask(new UpdateCheckerTask(getActivity()));
                     return true;
                 }
             });

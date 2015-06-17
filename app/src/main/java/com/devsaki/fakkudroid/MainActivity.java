@@ -1,8 +1,10 @@
 package com.devsaki.fakkudroid;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,10 +20,13 @@ import android.widget.Toast;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
+import com.devsaki.fakkudroid.database.domains.ImageFile;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.devsaki.fakkudroid.service.DownloadManagerService;
+import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.Constants;
+import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
 import com.melnykov.fab.FloatingActionButton;
 
@@ -45,6 +50,7 @@ public class MainActivity extends ActionBarActivity {
 
     private FakkuDroidDB db;
     private Content currentContent;
+    private FloatingActionButton fabRead, fabDownload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,16 +70,25 @@ public class MainActivity extends ActionBarActivity {
         });
         webview.addJavascriptInterface(new FakkuLoadListener(), "HTMLOUT");
         String intentVar = getIntent().getStringExtra(INTENT_URL);
-        webview.loadUrl(intentVar==null? Constants.FAKKU_URL:intentVar);
+        webview.loadUrl(intentVar == null ? Constants.FAKKU_URL : intentVar);
 
-        FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+        fabRead = (FloatingActionButton) findViewById(R.id.fabRead);
+        fabRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readContent();
+            }
+        });
+        fabRead.setVisibility(View.INVISIBLE);
+
+        fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
         fabDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 downloadContent();
             }
         });
-        fabDownload.hide(true);
+        fabDownload.setVisibility(View.INVISIBLE);
 
         db = new FakkuDroidDB(MainActivity.this);
 
@@ -94,12 +109,41 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
+    private void readContent() {
+        currentContent = db.selectContentById(currentContent.getId());
+        File dir = Helper.getDownloadDir(currentContent.getFakkuId(), this);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (Status.DOWNLOADED == currentContent.getStatus() || Status.ERROR == currentContent.getStatus() ) {
+            if (currentContent.getImageFiles() != null)
+                for (ImageFile imageFile : currentContent.getImageFiles()) {
+                    File file = new File(dir, imageFile.getName());
+                    if (file.exists()) {
+                        int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
+                        if (readContentPreference == 0)
+                            AndroidHelper.openFile(file, this);
+                        else
+                            AndroidHelper.openPerfectViewer(file, this);
+                        return;
+                    }
+                }
+            else {
+                File file = new File(dir, "001.jpg");
+                int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
+                if (readContentPreference == 0)
+                    AndroidHelper.openFile(file, this);
+                else
+                    AndroidHelper.openPerfectViewer(file, this);
+            }
+        }else{
+            fabRead.setVisibility(View.INVISIBLE);
+        }
+    }
+
     private void downloadContent() {
         currentContent = db.selectContentById(currentContent.getId());
         if (Status.DOWNLOADED == currentContent.getStatus()) {
             Toast.makeText(this, R.string.already_downloaded, Toast.LENGTH_SHORT).show();
-            FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-            fabDownload.hide();
+            fabDownload.setVisibility(View.INVISIBLE);
             return;
         }
         Toast.makeText(this, R.string.in_queue, Toast.LENGTH_SHORT).show();
@@ -109,8 +153,7 @@ public class MainActivity extends ActionBarActivity {
         db.updateContentStatus(currentContent);
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, DownloadManagerService.class);
         startService(intent);
-        FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-        fabDownload.hide();
+        fabDownload.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -152,8 +195,8 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-            fabDownload.hide();
+            fabDownload.setVisibility(View.INVISIBLE);
+            fabRead.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -194,7 +237,9 @@ public class MainActivity extends ActionBarActivity {
                 if(paths.length>=3){
                     if(paths[1].equals("doujinshi")||paths[1].equals("manga")){
                         if(paths.length==3||!paths[3].equals("read")){
-                            view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
+                            try {
+                                view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
+                            }catch (Exception ex){}
                         }
                     }
                 }
@@ -235,15 +280,19 @@ public class MainActivity extends ActionBarActivity {
             } else {
                 content.setStatus(contentbd.getStatus());
             }
-            if (content.isDownloadable()&&content.getStatus()!=Status.DOWNLOADED) {
+            if (content.isDownloadable()&&content.getStatus()!=Status.DOWNLOADED&&content.getStatus()!=Status.DOWNLOADING) {
                 currentContent = content;
-                FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-                fabDownload.show();
-                WebView webview = (WebView) findViewById(R.id.wbMain);
-                webview.stopLoading();
+                fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+                fabDownload.setVisibility(View.VISIBLE);
             }else {
-                FloatingActionButton fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-                fabDownload.hide();
+                fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
+                fabDownload.setVisibility(View.INVISIBLE);
+            }
+            if(content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR){
+                currentContent = content;
+                fabRead.setVisibility(View.VISIBLE);
+            }else{
+                fabRead.setVisibility(View.INVISIBLE);
             }
         }
     }

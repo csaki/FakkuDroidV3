@@ -71,7 +71,10 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         TextView tvArtist = (TextView) rowView.findViewById(R.id.tvArtist);
         TextView tvTags = (TextView) rowView.findViewById(R.id.tvTags);
 
-        tvTitle.setText(content.getTitle());
+        if(content.getTitle()==null)
+            tvTitle.setText(R.string.tvTitleEmpty);
+        else
+            tvTitle.setText(content.getTitle());
         String serie = null;
 
         serie = content.getSerie()!=null?content.getSerie().getName()!=null?content.getSerie().getName():"":"";

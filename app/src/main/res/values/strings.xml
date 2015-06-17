@@ -17,6 +17,7 @@
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
 
+    <string name="tvTitleEmpty">[No data]</string>
     <string name="tvSeries"><![CDATA[<b>Serie:</b> @serie@]]></string>
     <string name="tvArtists"><![CDATA[<b>Artist:</b> @artist@]]></string>
     <string name="tvTags"><![CDATA[<font color="#B40404"><b>@tag@</b></font>]]></string>
@@ -53,4 +54,10 @@
     <string name="close">Close</string>
     <string name="new_version_available">A new version is available</string>
     <string name="version_number">Your version is @oldVersion and the new one is @newVersion</string>
+
+
+    <string name="looking_new_versions">Looking for new versions</string>
+    <string name="find_new_version">It exists a new versions</string>
+    <string name="not_find_new_version">You have the last version</string>
+    <string name="error_update_checker">Update Checker Error: Server Down</string>
 </resources>

@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.support.v4.view.MenuItemCompat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -145,17 +146,22 @@ public class DownloadsActivity extends FakkuDroidActivity<DownloadsActivity.Down
                 }
             });
             String settingDir = getSharedPreferences().getString(Constants.SETTINGS_FAKKUDROID_FOLDER, "");
-            boolean showMessageSupport = getSharedPreferences().getBoolean(ConstantsPreferences.SHOW_MESSAGE_SUPPORT, true);
+            boolean showMessageSupport = true;
             if (settingDir.isEmpty()) {
                 Intent intent = new Intent(getActivity(), SelectFolderActivity.class);
                 startActivity(intent);
                 getActivity().finish();
             } else {
                 searchContent();
-                if (showMessageSupport) {
-                    Intent intent = new Intent(getActivity(), MessageSupportActivity.class);
-                    startActivity(intent);
-                }
+            }
+            try{
+                PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+                showMessageSupport = getSharedPreferences().getBoolean(ConstantsPreferences.SHOW_MESSAGE_SUPPORT + pInfo.versionCode, true);
+
+            }catch (Exception ex){}
+            if (showMessageSupport) {
+                Intent intent = new Intent(getActivity(), MessageSupportActivity.class);
+                startActivity(intent);
             }
             return rootView;
         }

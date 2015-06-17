@@ -20,8 +20,8 @@
             android:entryValues="@array/pref_quantity_per_page_entry_values"/>
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="@string/pref_perfomance_category"
-        android:key="pref_key_perfomance_settings">
+        android:title="@string/pref_library_category"
+        android:key="pref_key_library_settings">
 
         <ListPreference
             android:key="pref_read_content_lists"
@@ -38,5 +38,20 @@
         <Preference android:key="pref_add_no_media_file"
             android:title="@string/pref_add_no_media_file_title"
             android:summary="@string/pref_add_no_media_file_summary"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_others_category"
+        android:key="pref_key_others_settings">
+
+        <ListPreference
+            android:key="pref_check_updates_lists"
+            android:title="@string/pref_check_updates_title"
+            android:summary="@string/pref_check_updates_summary"
+            android:defaultValue="@string/pref_check_updates_default"
+            android:entries="@array/pref_check_updates_entries"
+            android:entryValues="@array/pref_check_updates_entry_values"/>
+        <Preference android:key="pref_check_updates_now"
+            android:title="@string/pref_check_updates_now_title"
+            android:summary="@string/pref_check_updates_now_summary"/>
     </PreferenceCategory>
 </PreferenceScreen>

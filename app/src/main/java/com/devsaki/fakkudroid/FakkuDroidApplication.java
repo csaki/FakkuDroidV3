@@ -19,7 +19,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.devsaki.fakkudroid.asynctasks.UpdateCheckerTask;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.dto.LastVersionDto;
@@ -53,9 +55,6 @@ public class FakkuDroidApplication extends Application {
     private static final String TAG = FakkuDroidApplication.class.getName();
     private LruCache<String, Bitmap> mMemoryCache;
     private SharedPreferences sharedPreferences;
-    private LastVersionDto lastVersionDto;
-    private NotificationManager notificationManager;
-    private NotificationCompat.Builder mBuilder;
 
     @Override
     public void onCreate() {
@@ -86,8 +85,9 @@ public class FakkuDroidApplication extends Application {
         };
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        AndroidHelper.executeAsyncTask(new UpdateCheckerTask());
+        if(sharedPreferences.getString(ConstantsPreferences.PREF_CHECK_UPDATES_LISTS, ConstantsPreferences.PREF_CHECK_UPDATES_DEFAULT+"").equals(ConstantsPreferences.PREF_CHECK_UPDATES_ENABLE+"")) {
+            AndroidHelper.executeAsyncTask(new UpdateCheckerTask(this));
+        }
     }
 
 
@@ -113,69 +113,6 @@ public class FakkuDroidApplication extends Application {
             mImageView.setImageResource(R.drawable.ic_fakkudroid_launcher);
             BitmapWorkerTask task = new BitmapWorkerTask(mImageView);
             task.execute(file);
-        }
-    }
-
-    public LastVersionDto getLastVersionDto() {
-        return lastVersionDto;
-    }
-
-    class UpdateCheckerTask extends AsyncTask<String, Void, LastVersionDto> {
-
-        @Override
-        protected void onPreExecute() {
-            FakkuDroidApplication.this.lastVersionDto = null;
-        }
-
-        @Override
-        protected LastVersionDto doInBackground(String... params) {
-            try {
-                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                UserRequest userRequest = new UserRequest();
-                String androidId = Settings.Secure.getString(FakkuDroidApplication.this.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
-                userRequest.setIdDevice(androidId);
-                userRequest.setManufacturer(Build.MANUFACTURER);
-                userRequest.setModel(Build.MODEL);
-                userRequest.setAppVersionCode(pInfo.versionCode);
-                userRequest.setAppVersionName(pInfo.versionName);
-
-                return HttpClientHelper.checkLastVersion(userRequest);
-            } catch (Exception ex) {
-                Log.e(TAG, "update checker asynctask", ex);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(LastVersionDto result) {
-            super.onPostExecute(result);
-            if (result != null) {
-                try {
-                    PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-
-                    if (result.getLastVersionCode() > pInfo.versionCode) {
-                        FakkuDroidApplication.this.lastVersionDto = result;
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(lastVersionDto.getDocumentationLink()));
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(FakkuDroidApplication.this,
-                                0, intent, PendingIntent.FLAG_ONE_SHOT);
-                        mBuilder = new NotificationCompat.Builder(
-                                FakkuDroidApplication.this).setSmallIcon(
-                                R.drawable.ic_fakkudroid_launcher).setContentTitle(getString(R.string.new_version_available));
-                        mBuilder.setContentText(getString(R.string.version_number).replace("@oldVersion",pInfo.versionName).replace("@newVersion", lastVersionDto.getLastVersionName()));
-                        mBuilder.setProgress(0, 0, false);
-                        Notification notif = mBuilder.build();
-                        notif.contentIntent = resultPendingIntent;
-                        notif.flags = notif.flags | Notification.DEFAULT_LIGHTS
-                                | Notification.FLAG_AUTO_CANCEL;
-
-                        notificationManager.notify(0, notif);
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    Log.e(TAG, "update checker asynctask - onpost ", e);
-                }
-            }
         }
     }
 

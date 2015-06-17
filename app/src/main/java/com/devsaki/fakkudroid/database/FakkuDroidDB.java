@@ -86,7 +86,10 @@ public class FakkuDroidDB extends SQLiteOpenHelper {
                         statement.bindNull(5);
                     else
                         statement.bindString(5, row.getHtmlDescription());
-                    statement.bindString(6, row.getTitle());
+                    if(row.getTitle()==null)
+                        statement.bindNull(6);
+                    else
+                        statement.bindString(6, row.getTitle());
                     statement.bindLong(7, row.getQtyPages());
                     statement.bindLong(8, row.getUploadDate());
                     statement.bindLong(9, row.getDownloadDate());
