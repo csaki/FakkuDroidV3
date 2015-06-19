@@ -36,7 +36,6 @@ public class DownloadManagerService extends IntentService {
     public static final String NOTIFICATION = "com.devsaki.fakkudroid.service";
 
     private NotificationManager notificationManager;
-    private NotificationCompat.Builder mBuilder;
     private FakkuDroidDB db;
     public static boolean paused;
 
@@ -138,9 +137,7 @@ public class DownloadManagerService extends IntentService {
             error = true;
         }
 
-        mBuilder = new NotificationCompat.Builder(
-                DownloadManagerService.this).setSmallIcon(
-                R.drawable.ic_fakkudroid_launcher).setContentTitle(content.getTitle());
+
         showNotification(0, content);
         int count = 0;
         for (ImageFile imageFile : content.getImageFiles()) {
@@ -211,6 +208,10 @@ public class DownloadManagerService extends IntentService {
     }
 
     private void showNotification(double percent, Content content) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                DownloadManagerService.this).setSmallIcon(
+                R.drawable.ic_fakkudroid_launcher).setContentTitle(content.getTitle());
+
         Intent resultIntent = null;
         if(content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR){
             resultIntent= new Intent(DownloadManagerService.this,

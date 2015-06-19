@@ -23,10 +23,8 @@ import com.devsaki.fakkudroid.R;
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Attribute;
 import com.devsaki.fakkudroid.database.domains.Content;
-import com.devsaki.fakkudroid.database.domains.ImageFile;
 import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.Constants;
-import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
 
 import org.apache.commons.io.FileUtils;
@@ -113,7 +111,7 @@ public class ContentAdapter extends ArrayAdapter<Content> {
         btnRead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                readContent(content, dir);
+                AndroidHelper.openContent(content, getContext());
             }
         });
         Button btnDelete = (Button) rowView.findViewById(R.id.btnDelete);
@@ -131,29 +129,6 @@ public class ContentAdapter extends ArrayAdapter<Content> {
             }
         });
         return rowView;
-    }
-
-    private void readContent(Content content, File dir) {
-        if (content.getImageFiles() != null)
-            for (ImageFile imageFile : content.getImageFiles()) {
-                File file = new File(dir, imageFile.getName());
-                if (file.exists()) {
-                    int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
-                    if (readContentPreference == 0)
-                        AndroidHelper.openFile(file, getContext());
-                    else
-                        AndroidHelper.openPerfectViewer(file, getContext());
-                    return;
-                }
-            }
-        else {
-            File file = new File(dir, "001.jpg");
-            int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
-            if (readContentPreference == 0)
-                AndroidHelper.openFile(file, getContext());
-            else
-                AndroidHelper.openPerfectViewer(file, getContext());
-        }
     }
 
     private void deleteContent(final Content content, final File dir) {

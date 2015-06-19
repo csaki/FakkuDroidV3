@@ -17,6 +17,10 @@ public class UserRequest {
     private String appVersionName;
     @SerializedName("app_version_code")
     private Integer appVersionCode;
+    @SerializedName("android_version_name")
+    private String androidVersionName;
+    @SerializedName("android_version_code")
+    private Integer androidVersionCode;
 
     public String getIdDevice() {
         return idDevice;
@@ -56,5 +60,21 @@ public class UserRequest {
 
     public void setAppVersionCode(Integer appVersionCode) {
         this.appVersionCode = appVersionCode;
+    }
+
+    public String getAndroidVersionName() {
+        return androidVersionName;
+    }
+
+    public void setAndroidVersionName(String androidVersionName) {
+        this.androidVersionName = androidVersionName;
+    }
+
+    public Integer getAndroidVersionCode() {
+        return androidVersionCode;
+    }
+
+    public void setAndroidVersionCode(Integer androidVersionCode) {
+        this.androidVersionCode = androidVersionCode;
     }
 }

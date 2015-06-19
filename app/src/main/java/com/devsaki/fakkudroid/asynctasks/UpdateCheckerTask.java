@@ -54,7 +54,8 @@ public class UpdateCheckerTask extends AsyncTask<String, Void, LastVersionDto> {
             userRequest.setModel(Build.MODEL);
             userRequest.setAppVersionCode(pInfo.versionCode);
             userRequest.setAppVersionName(pInfo.versionName);
-
+            userRequest.setAndroidVersionCode(Build.VERSION.SDK_INT);
+            userRequest.setAndroidVersionName(Build.VERSION.RELEASE);
             return HttpClientHelper.checkLastVersion(userRequest);
         } catch (Exception ex) {
             Log.e(TAG, "update checker asynctask", ex);
@@ -92,8 +93,9 @@ public class UpdateCheckerTask extends AsyncTask<String, Void, LastVersionDto> {
                 }
             } catch (PackageManager.NameNotFoundException e) {
                 Log.e(TAG, "update checker asynctask - onpost ", e);
-                Toast.makeText(mContext, R.string.error_update_checker, Toast.LENGTH_SHORT).show();
             }
+        }else{
+            Toast.makeText(mContext, R.string.error_update_checker, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -1,10 +1,8 @@
 package com.devsaki.fakkudroid;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,13 +18,11 @@ import android.widget.Toast;
 
 import com.devsaki.fakkudroid.database.FakkuDroidDB;
 import com.devsaki.fakkudroid.database.domains.Content;
-import com.devsaki.fakkudroid.database.domains.ImageFile;
 import com.devsaki.fakkudroid.database.enums.Status;
 import com.devsaki.fakkudroid.parser.FakkuParser;
 import com.devsaki.fakkudroid.service.DownloadManagerService;
 import com.devsaki.fakkudroid.util.AndroidHelper;
 import com.devsaki.fakkudroid.util.Constants;
-import com.devsaki.fakkudroid.util.ConstantsPreferences;
 import com.devsaki.fakkudroid.util.Helper;
 import com.melnykov.fab.FloatingActionButton;
 
@@ -110,32 +106,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void readContent() {
-        currentContent = db.selectContentById(currentContent.getId());
-        File dir = Helper.getDownloadDir(currentContent.getFakkuId(), this);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (Status.DOWNLOADED == currentContent.getStatus() || Status.ERROR == currentContent.getStatus() ) {
-            if (currentContent.getImageFiles() != null)
-                for (ImageFile imageFile : currentContent.getImageFiles()) {
-                    File file = new File(dir, imageFile.getName());
-                    if (file.exists()) {
-                        int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
-                        if (readContentPreference == 0)
-                            AndroidHelper.openFile(file, this);
-                        else
-                            AndroidHelper.openPerfectViewer(file, this);
-                        return;
-                    }
-                }
-            else {
-                File file = new File(dir, "001.jpg");
-                int readContentPreference = Integer.parseInt(sharedPreferences.getString(ConstantsPreferences.PREF_READ_CONTENT_LISTS, ConstantsPreferences.PREF_READ_CONTENT_DEFAULT + ""));
-                if (readContentPreference == 0)
-                    AndroidHelper.openFile(file, this);
-                else
-                    AndroidHelper.openPerfectViewer(file, this);
+        if(currentContent!=null){
+            currentContent = db.selectContentById(currentContent.getId());
+            if (Status.DOWNLOADED == currentContent.getStatus() || Status.ERROR == currentContent.getStatus() ) {
+                AndroidHelper.openContent(currentContent, this);
+            }else{
+                fabRead.setVisibility(View.INVISIBLE);
             }
-        }else{
-            fabRead.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -282,17 +259,35 @@ public class MainActivity extends ActionBarActivity {
             }
             if (content.isDownloadable()&&content.getStatus()!=Status.DOWNLOADED&&content.getStatus()!=Status.DOWNLOADING) {
                 currentContent = content;
-                fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-                fabDownload.setVisibility(View.VISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabDownload.setVisibility(View.VISIBLE);
+                    }
+                });
             }else {
-                fabDownload = (FloatingActionButton) findViewById(R.id.fabDownload);
-                fabDownload.setVisibility(View.INVISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabDownload.setVisibility(View.INVISIBLE);
+                    }
+                });
             }
             if(content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR){
                 currentContent = content;
-                fabRead.setVisibility(View.VISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabRead.setVisibility(View.VISIBLE);
+                    }
+                });
             }else{
-                fabRead.setVisibility(View.INVISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabRead.setVisibility(View.INVISIBLE);
+                    }
+                });
             }
         }
     }
