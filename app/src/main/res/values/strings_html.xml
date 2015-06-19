@@ -23,4 +23,37 @@
 	    	</html>
 	    ]]>
     </string>
+	<string name="hack_add_tags">
+		<![CDATA[
+			javascript:
+			try{
+				var select = document.getElementsByClassName(\'mobile-select\')[0];
+				var currentOptions = select.childNodes;
+				var alreadyExistsTags = false;
+				var item;
+				for (item in currentOptions) {
+					if(currentOptions[item].innerHTML===\'Tags\'){
+						alreadyExistsTags =true;
+						break;
+					}
+				}
+				if(!alreadyExistsTags){
+					var tagOption = document.createElement(\'option\');
+					var textnode = document.createTextNode(\'Tags\');
+					tagOption.setAttribute(\'value\',\'/@category/tags\');
+					tagOption.appendChild(textnode);
+					select.appendChild(tagOption);
+
+					select = document.getElementsByClassName(\'browse-links\')[0];
+					tagOption = document.createElement(\'a\');
+					textnode = document.createTextNode(\'Tags\');
+					tagOption.setAttribute(\'href\',\'/@category/tags\');
+					tagOption.appendChild(textnode);
+					select.appendChild(tagOption);
+				}
+			}catch(e){
+				console.log(e);
+			}
+	    ]]>
+	</string>
 </resources>

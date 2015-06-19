@@ -106,11 +106,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void readContent() {
-        if(currentContent!=null){
+        if (currentContent != null) {
             currentContent = db.selectContentById(currentContent.getId());
-            if (Status.DOWNLOADED == currentContent.getStatus() || Status.ERROR == currentContent.getStatus() ) {
+            if (Status.DOWNLOADED == currentContent.getStatus() || Status.ERROR == currentContent.getStatus()) {
                 AndroidHelper.openContent(currentContent, this);
-            }else{
+            } else {
                 fabRead.setVisibility(View.INVISIBLE);
             }
         }
@@ -157,7 +157,6 @@ public class MainActivity extends ActionBarActivity {
             try {
                 URL u = new URL(url);
                 if (u.getHost().equals("www.fakku.net")) {
-                    view.loadUrl(url);
                     return false;
                 } else {
                     Intent i = new Intent(Intent.ACTION_VIEW);
@@ -178,17 +177,17 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            try{
+            try {
                 String cookies = CookieManager.getInstance().getCookie(url);
                 Log.i(TAG, "COOKIES ---- > " + cookies);
-                java.net.CookieManager cookieManager = (java.net.CookieManager)CookieHandler.getDefault();
-                if(cookieManager==null)
+                java.net.CookieManager cookieManager = (java.net.CookieManager) CookieHandler.getDefault();
+                if (cookieManager == null)
                     cookieManager = new java.net.CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 CookieHandler.setDefault(cookieManager);
                 String[] cookiesArray = cookies.split(";");
                 URI fakkuCookie = new URI("https://fakku.net/");
-                for(String cookie: cookiesArray){
+                for (String cookie : cookiesArray) {
                     String key = cookie.split("=")[0].trim();
                     String value = cookie.split("=")[1].trim();
                     HttpCookie httpCookie = new HttpCookie(key, value);
@@ -198,7 +197,7 @@ public class MainActivity extends ActionBarActivity {
                     cookieManager.getCookieStore().removeAll();
                     cookieManager.getCookieStore().add(fakkuCookie, httpCookie);
                 }
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 Log.e(TAG, "trying to get the cookies", ex);
             }
 
@@ -209,16 +208,27 @@ public class MainActivity extends ActionBarActivity {
                 Log.e(TAG, "Error reading current url form webview", e);
             }
 
-            if (uri!=null&&uri.getPath()!=null) {
+            if (uri != null && uri.getPath() != null) {
                 String[] paths = uri.getPath().split("/");
-                if(paths.length>=3){
-                    if(paths[1].equals("doujinshi")||paths[1].equals("manga")){
-                        if(paths.length==3||!paths[3].equals("read")){
+                if (paths.length >= 3) {
+                    if (paths[1].equals("doujinshi") || paths[1].equals("manga")) {
+                        if (paths.length == 3 || !paths[3].equals("read")) {
                             try {
                                 view.loadUrl("javascript:window.HTMLOUT.processHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
-                            }catch (Exception ex){}
+                            } catch (Exception ex) {
+                                Log.e(TAG, "Error executing javascript in webview", ex);
+                            }
                         }
                     }
+                } else if (paths.length == 2) {
+                    String category = paths[1];
+                    if (paths[1].equals("doujinshi") || paths[1].equals("manga"))
+                        try {
+                            String javascript = getString(R.string.hack_add_tags).replace("@category", category);
+                            view.loadUrl(javascript);
+                        } catch (Exception ex) {
+                            Log.e(TAG, "Error executing javascript in webview", ex);
+                        }
                 }
             }
         }
@@ -228,7 +238,7 @@ public class MainActivity extends ActionBarActivity {
 
         @JavascriptInterface
         public void processHTML(String html) {
-            if(html==null)
+            if (html == null)
                 return;
             Content content = FakkuParser.parseContent(html);
             if (content == null) {
@@ -244,7 +254,7 @@ public class MainActivity extends ActionBarActivity {
                     Log.e(TAG, "Saving content", e);
                     return;
                 }
-            }else if(contentbd.getStatus()==Status.MIGRATED){
+            } else if (contentbd.getStatus() == Status.MIGRATED) {
                 content.setStatus(Status.DOWNLOADED);
                 db.insertContent(content);
                 //Save JSON file
@@ -257,7 +267,7 @@ public class MainActivity extends ActionBarActivity {
             } else {
                 content.setStatus(contentbd.getStatus());
             }
-            if (content.isDownloadable()&&content.getStatus()!=Status.DOWNLOADED&&content.getStatus()!=Status.DOWNLOADING) {
+            if (content.isDownloadable() && content.getStatus() != Status.DOWNLOADED && content.getStatus() != Status.DOWNLOADING) {
                 currentContent = content;
                 runOnUiThread(new Runnable() {
                     @Override
@@ -265,7 +275,7 @@ public class MainActivity extends ActionBarActivity {
                         fabDownload.setVisibility(View.VISIBLE);
                     }
                 });
-            }else {
+            } else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -273,7 +283,7 @@ public class MainActivity extends ActionBarActivity {
                     }
                 });
             }
-            if(content.getStatus()==Status.DOWNLOADED||content.getStatus()==Status.ERROR){
+            if (content.getStatus() == Status.DOWNLOADED || content.getStatus() == Status.ERROR) {
                 currentContent = content;
                 runOnUiThread(new Runnable() {
                     @Override
@@ -281,7 +291,7 @@ public class MainActivity extends ActionBarActivity {
                         fabRead.setVisibility(View.VISIBLE);
                     }
                 });
-            }else{
+            } else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
